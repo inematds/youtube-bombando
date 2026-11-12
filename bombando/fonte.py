@@ -29,13 +29,16 @@ class Fonte:
             time.sleep(max(0, self.config['pausa_s'] - (time.monotonic() - self.ultima)))
         comando = ['yt-dlp', '--ignore-config', '--socket-timeout', '20',
                    '--retries', '1', '--extractor-retries', '1',
-                   '--extractor-args', f"youtube:lang={self.config['idioma']}",
+                   # Sem youtube:lang=pt: com ele o yt-dlp lê "3,4 mil" como 34 e perde os inscritos.
                    '--geo-bypass-country', self.config['regiao']]
         if tipo == 'buscas':
             url = ('https://www.youtube.com/results?search_query=' + quote_plus(chave)
                    + '&sp=EgIIAw%253D%253D')
             comando += ['--flat-playlist', '-J', '--playlist-end',
                         str(self.config['por_nicho_busca']), url]
+        elif tipo == 'canais':
+            comando += ['--flat-playlist', '-J', '--playlist-end', '20',
+                        'https://www.youtube.com/channel/' + chave + '/videos']
         else:
             comando += ['--skip-download', '-J', 'https://www.youtube.com/watch?v=' + chave]
         try:

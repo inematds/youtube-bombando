@@ -1,0 +1,80 @@
+{
+  "UCdemo1": {
+    "channel": "Laboratório IA",
+    "channel_follower_count": 10000,
+    "entries": [
+      {
+        "id": "iaDemo00001",
+        "view_count": 48000
+      },
+      {
+        "id": "recente",
+        "view_count": 100
+      },
+      {
+        "id": "antigo0",
+        "upload_date": "20260101",
+        "view_count": 8000
+      },
+      {
+        "id": "antigo1",
+        "upload_date": "20260101",
+        "view_count": 9000
+      },
+      {
+        "id": "antigo2",
+        "upload_date": "20260101",
+        "view_count": 10000
+      },
+      {
+        "id": "antigo3",
+        "upload_date": "20260101",
+        "view_count": 11000
+      },
+      {
+        "id": "antigo4",
+        "upload_date": "20260101",
+        "view_count": 12000
+      }
+    ]
+  },
+  "UCdemo2": {
+    "channel": "Oficina n8n",
+    "channel_follower_count": 4000,
+    "entries": [
+      {
+        "id": "n8nDemo0001",
+        "view_count": 48000
+      },
+      {
+        "id": "recente",
+        "view_count": 100
+      },
+      {
+        "id": "antigo0",
+        "upload_date": "20260101",
+        "view_count": 10000
+      },
+      {
+        "id": "antigo1",
+        "upload_date": "20260101",
+        "view_count": 11000
+      },
+      {
+        "id": "antigo2",
+        "upload_date": "20260101",
+        "view_count": 12000
+      },
+      {
+        "id": "antigo3",
+        "upload_date": "20260101",
+        "view_count": 13000
+      },
+      {
+        "id": "antigo4",
+        "upload_date": "20260101",
+        "view_count": 14000
+      }
+    ]
+  }
+}

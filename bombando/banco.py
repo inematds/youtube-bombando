@@ -28,4 +28,13 @@ def abrir(caminho):
             fotos INTEGER, erros TEXT, fixtures INTEGER
         );
     ''')
+    db.execute("""CREATE TABLE IF NOT EXISTS canais (
+        channel_id TEXT PRIMARY KEY, nome TEXT, inscritos INTEGER,
+        mediana_views REAL, n_amostra INTEGER, atualizado TEXT,
+        amostra TEXT
+    )""")
+    colunas = {r[1] for r in db.execute('PRAGMA table_info(videos)')}
+    if 'descricao' not in colunas:
+        db.execute('ALTER TABLE videos ADD COLUMN descricao TEXT')
+    db.commit()
     return db

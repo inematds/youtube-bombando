@@ -31,7 +31,11 @@ def acompanhar(db, fonte, agora, registrar, nicho=None):
             elif dados.get('upload_date'):
                 publicado = datetime.strptime(dados['upload_date'], '%Y%m%d').replace(tzinfo=timezone.utc).isoformat()
             with db:
-                db.execute('UPDATE videos SET publicado=COALESCE(?,publicado) WHERE id=?', (publicado, video['id']))
+                db.execute('''UPDATE videos SET publicado=COALESCE(?,publicado),
+                    descricao=COALESCE(?,descricao), channel_id=COALESCE(?,channel_id),
+                    canal=COALESCE(?,canal) WHERE id=?''',
+                    (publicado, dados.get('description'), dados.get('channel_id'),
+                     dados.get('channel'), video['id']))
                 db.execute('INSERT INTO fotos VALUES (?,?,?,?,?,?)', (video['id'], agora.date().isoformat(),
                     *(numero(dados.get(campo)) for campo in ('view_count', 'like_count', 'comment_count', 'channel_follower_count'))))
             total += 1

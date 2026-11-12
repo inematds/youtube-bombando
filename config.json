@@ -41,5 +41,31 @@
   "max_detalhes_por_rodada": 250,
   "pausa_s": 1.5,
   "idioma": "pt",
-  "regiao": "BR"
+  "regiao": "BR",
+  "max_canais_por_rodada": 200,
+  "pessoas": [
+    "Sam Altman",
+    "Elon Musk",
+    "Jensen Huang",
+    "Dario Amodei",
+    "Demis Hassabis",
+    "Andrej Karpathy",
+    "Mark Zuckerberg",
+    "Satya Nadella",
+    "Sundar Pichai",
+    "Ilya Sutskever",
+    "Yann LeCun",
+    "Geoffrey Hinton",
+    "Fei-Fei Li",
+    "Andrew Ng",
+    "Lex Fridman",
+    "Joe Rogan",
+    "Bill Gates",
+    "Steve Jobs",
+    "Trump",
+    "Lula",
+    "Primo Rico",
+    "Thiago Nigro",
+    "Flow Podcast"
+  ]
 }

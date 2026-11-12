@@ -1,4 +1,5 @@
 """Métricas reproduzíveis; valores ausentes continuam ausentes."""
+import json
 import math
 import re
 import statistics
@@ -15,6 +16,15 @@ ser ter tem está esta estão foi vai vou pode podem precisa agora aqui ali pra 
 até ate mas mesmo só so bem tão tao dia dias vez coisa coisas entre depois antes
 nunca sempre ainda então entao porque porquê lo la ele ela eles elas nós nos vc
 get new now all not just will has have more most best top part parte ep shorts'''.split())
+from .quemfala import detectar
+from .canais import linha_base
+
+FATOR_CONTEUDO = 3
+FATOR_CONVIDADO = 1.5
+PORTE_PEQUENO = 10_000
+PORTE_GRANDE = 500_000
+CATEGORIAS = ('Conteúdo', 'Quem fala', 'Quem posta', 'Conteúdo + quem fala', 'Misto', 'Sem dados')
+
 MIN_VIDEOS_POR_TERMO = 2  # termo de um título só não é "assunto em alta"
 
 
@@ -61,13 +71,25 @@ def assuntos(videos):
     return [dict(termo=t, peso=p, videos=vistos[t]) for t, p in sorted(validos, key=lambda x: (-x[1], x[0]))[:15]]
 
 
-def montar(db, agora):
+def montar(db, agora, config=None):
     videos = []
     for linha in db.execute('SELECT * FROM videos ORDER BY id'):
         video = dict(linha)
         video['nichos'] = [r[0] for r in db.execute('SELECT nicho FROM video_nichos WHERE video_id=? ORDER BY nicho', (video['id'],))]
         video['fotos'] = [dict(r) for r in db.execute('SELECT * FROM fotos WHERE id=? ORDER BY dia', (video['id'],))]
         video.update(calcular(video['publicado'], video['fotos'], agora))
+        cache = db.execute('SELECT * FROM canais WHERE channel_id=?', (video['channel_id'],)).fetchone()
+        base = dict(cache) if cache else {}
+        if base.get('amostra') is not None:
+            base.update(linha_base(json.loads(base['amostra']), video['id'], agora))
+        inscritos = numero(video['fotos'][-1].get('inscritos')) if video['fotos'] else None
+        if inscritos is None:
+            inscritos = numero(base.get('inscritos'))
+        video.update(detectar(video['titulo'], video.get('descricao'), (config or {}).get('pessoas')))
+        video.update(classificar(video['views'], base.get('mediana_views'), inscritos,
+                                video['pessoa'], video['formato_convidado'], video['trecho_convidado']))
+        video['n_amostra'] = base.get('n_amostra', 0)
+        video['canal_atualizado'] = base.get('atualizado')
         video['notas'] = {}
         video['nota'] = 0
         videos.append(video)
@@ -84,4 +106,70 @@ def montar(db, agora):
     for v in videos:
         v['nota'] = max(v['notas'].values(), default=0)
     tendencias = {n: assuntos([v for v in ativos if n in v['nichos']]) for n in nichos}
-    return dict(videos=videos, nichos=nichos, assuntos={'geral': assuntos(ativos), 'nichos': tendencias})
+    return dict(videos=videos, nichos=nichos, assuntos={'geral': assuntos(ativos), 'nichos': tendencias},
+                porque={'geral': resumir(ativos),
+                        'nichos': {n: resumir([v for v in ativos if n in v['nichos']], n) for n in nichos}})
+
+
+def formatar(valor, contagem=False):
+    # Contagens (inscritos, mediana) sem casa decimal; razões e % com uma.
+    modelo = '{:,.0f}' if contagem else '{:,.1f}'
+    return modelo.format(valor).replace(',', '_').replace('.', ',').replace('_', '.')
+
+
+def classificar(views, mediana, inscritos, pessoa=None, convidado=False, trecho=None):
+    views, mediana, inscritos = numero(views), numero(mediana), numero(inscritos)
+    porte = (None if inscritos is None else 'pequeno' if inscritos < PORTE_PEQUENO
+             else 'grande' if inscritos > PORTE_GRANDE else 'médio')
+    fator = views / mediana if views is not None and mediana else None
+    sinal = bool(pessoa or convidado)
+    if fator is None:
+        categoria = 'Sem dados'
+        motivo = 'Sem views confirmadas ou linha de base positiva do canal.'
+    else:
+        if fator >= FATOR_CONTEUDO:
+            categoria = 'Conteúdo + quem fala' if sinal else 'Conteúdo'
+        elif fator >= FATOR_CONVIDADO and sinal:
+            categoria = 'Quem fala'
+        elif fator < FATOR_CONVIDADO and porte == 'grande':
+            categoria = 'Quem posta'
+        else:
+            categoria = 'Misto'
+        motivo = f'{formatar(fator)}× o normal do canal (mediana {formatar(mediana, True)})'
+        motivo += f' · canal {porte} ({formatar(inscritos, True)} inscritos)' if porte else ' · porte desconhecido'
+        if sinal:
+            motivo += f' · sinal de convidado: {pessoa or trecho or "formato com convidado"}'
+    return dict(fator_canal=fator, mediana_views=mediana, porte=porte,
+                categoria=categoria, motivo=motivo)
+
+
+def resumir(videos, nicho='geral'):
+    videos = [v for v in videos if not v.get('indisponivel') and v['views'] is not None]
+    total_views = sum(v['views'] for v in videos)
+    categorias = []
+    for categoria in CATEGORIAS:
+        grupo = [v for v in videos if v['categoria'] == categoria]
+        views = sum(v['views'] for v in grupo)
+        categorias.append(dict(categoria=categoria, videos=len(grupo), views=views,
+                               pct_videos=100 * len(grupo) / len(videos) if videos else 0,
+                               pct_views=100 * views / total_views if total_views else 0))
+    prefixo = 'No geral' if nicho == 'geral' else f'Em {nicho}'
+    pesos = {c['categoria']: c['pct_views'] for c in categorias}
+    conteudo = pesos['Conteúdo'] + pesos['Conteúdo + quem fala']
+    if not videos or not total_views:
+        conclusao = f'{prefixo}, ainda não há views suficientes para uma conclusão.'
+    elif pesos['Sem dados'] >= 50:
+        conclusao = f'{prefixo}, {formatar(pesos["Sem dados"])}% das views estão sem linha de base; ainda não é possível concluir.'
+    elif conteudo > 50:
+        conclusao = f'{prefixo}, {formatar(conteudo)}% das views vêm de vídeos com pelo menos 3× o normal do canal: o sinal de CONTEÚDO predomina.'
+    elif pesos['Quem posta'] > 50:
+        conclusao = f'{prefixo}, {formatar(pesos["Quem posta"])}% das views estão em canais grandes no ritmo normal: o sinal de QUEM POSTA predomina.'
+    elif pesos['Quem fala'] > 50:
+        conclusao = f'{prefixo}, {formatar(pesos["Quem fala"])}% das views têm sinal de convidado e superam o normal: o sinal de QUEM FALA predomina.'
+    else:
+        conclusao = f'{prefixo}, as views se distribuem entre sinais mistos, sem predominância clara.'
+    bolha = sorted((v for v in videos if v['fator_canal'] is not None
+                    and v['fator_canal'] >= FATOR_CONTEUDO and v['porte'] in ('pequeno', 'médio')),
+                   key=lambda v: (-v['fator_canal'], v['id']))[:5]
+    return dict(categorias=categorias, total_videos=len(videos), total_views=total_views,
+                conclusao=conclusao, furaram_bolha=[v['id'] for v in bolha])

@@ -6,6 +6,7 @@ Comandos:
 - `python3 -m unittest discover -s tests -v`
 - `python3 bombando/rodada.py --fixtures tests/fixtures`
 - `python3 bombando/rodada.py --so-painel`
+- `python3 bombando/rodada.py --so-canais` (consulta só canais; use `--fixtures tests/fixtures` para offline)
 - `python3 bombando/rodada.py --nicho 'claude code'`
 - `bash deploy/instalar.sh` (instala timer e servidor de usuário)
 
