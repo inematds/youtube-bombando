@@ -54,7 +54,13 @@ class RodadaTest(unittest.TestCase):
         self.assertIn('<svg', pagina)
         self.assertIn('Vídeo privado de demonstração', pagina)
         self.assertNotIn('<script src=', pagina)
-        self.assertNotIn('<img ', pagina.split('<script id="dados"')[0])
+        # 1.2: o vídeo mais quente de cada nicho mostra a thumb; só do i.ytimg.com.
+        import re
+        estatico = pagina.split('<script id="dados"')[0]
+        self.assertTrue(all('i.ytimg.com/vi/' in t for t in re.findall(r'<img [^>]*>', estatico)))
+        self.assertIn('class="numeros"', estatico)
+        self.assertIn('class="cresc-g"', estatico)
+        self.assertIn('O que cada opção de ordenação quer dizer', estatico)
         dados = self.dados()
         self.assertEqual(sum(v['indisponivel'] for v in dados['videos']), 1)
         self.assertEqual(len(dados['videos'][0]['nichos']), 7)

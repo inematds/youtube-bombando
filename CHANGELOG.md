@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0 — 2026-11-12
+
+- Vídeo mais quente de cada nicho com thumb, views, idade, views/h, × canal, ganho 24h, categoria e gráfico de crescimento.
+- Gráfico de crescimento por vídeo (views × horas desde a publicação), mini na tabela e grande ao clicar.
+- “Ordenar por” explica a opção escolhida e lista todas; opções novas Views e Mais novos.
+- Idade em “d h” a partir de 48 h, com a definição (tempo desde a publicação) no painel.
+
 ## 1.1.0 — 2026-11-12
 
 - Linha de base por canal, cache de sete dias, amostras por vídeo e modo `--so-canais`.

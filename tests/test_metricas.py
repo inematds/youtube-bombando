@@ -2,7 +2,7 @@ import math
 import unittest
 from datetime import datetime, timezone
 from bombando.metricas import calcular, assuntos
-from bombando.painel import sparkline
+from bombando.painel import sparkline, crescimento, pontos_crescimento, idade_txt, curto, ORDENS
 
 
 class MetricasTest(unittest.TestCase):
@@ -48,3 +48,23 @@ class MetricasTest(unittest.TestCase):
         self.assertIn('<polyline', sparkline([dict(views=5), dict(views=5)]))
         self.assertNotIn('nan', sparkline([dict(views=0), dict(views=0)]))
         self.assertIn('Sem histórico', sparkline([]))
+
+    def test_crescimento_comeca_na_publicacao(self):
+        fotos = [dict(dia='2026-11-11', views=100), dict(dia='2026-11-12', views=400)]
+        pontos = pontos_crescimento(fotos, 30, self.agora)
+        self.assertEqual([(round(h), v) for h, v, _ in pontos], [(0, 0), (6, 100), (30, 400)])
+        grande = crescimento(fotos, 30, self.agora, grande=True)
+        self.assertIn('class="estimado"', grande)
+        self.assertIn('class="real"', grande)
+        self.assertIn('12/11: 400', grande)
+        self.assertIn('Sem histórico', crescimento([], 30, self.agora))
+        # foto anterior à publicação (idade menor que a diferença de dias) é descartada
+        self.assertEqual(len(pontos_crescimento(fotos, 5, self.agora)), 2)
+
+    def test_idade_e_numero_curto(self):
+        self.assertEqual(idade_txt(5.4), '5 h')
+        self.assertEqual(idade_txt(50), '2 d 2 h')
+        self.assertEqual(idade_txt(None), '—')
+        self.assertEqual(curto(1_234_567), '1,2 mi')
+        self.assertEqual(curto(34_000), '34 mil')
+        self.assertEqual(set(ORDENS), {'nota', 'velocidade', 'ganho_24h', 'multiplicador', 'fator_canal', 'views', 'novos'})

@@ -68,7 +68,21 @@ Datas são armazenadas em UTC. `timestamp` tem preferência sobre `upload_date`;
 - **Multiplicador:** views / inscritos. Inscritos ausentes ou zero deixam a métrica ausente.
 - **Nota:** `z-score(velocidade dentro do nicho) + ln(1 + multiplicador)`. O z-score usa desvio padrão populacional; com desvio zero ou velocidade ausente, vale zero. Multiplicador ausente contribui zero. A nota pode ser negativa. Em “Todos”, usa a maior nota entre os nichos do vídeo; ao selecionar um nicho, usa a nota daquele nicho. Indisponíveis ficam no fim e não entram nas estatísticas nem nos destaques.
 
-Zero e ausência são distintos: `—` indica dado desconhecido. Views da busca ficam no banco como estimativa inicial, separadas das fotos. A tabela exibe as fotos confirmadas. O histórico SVG usa os pontos diários disponíveis em ordem, com espaçamento igual entre observações; datas e métricas originais estão no JSON.
+Zero e ausência são distintos: `—` indica dado desconhecido. Views da busca ficam no banco como estimativa inicial, separadas das fotos. A tabela exibe as fotos confirmadas. O **gráfico de crescimento** (coluna “Crescimento”, clique para ampliar, e no vídeo mais quente de cada nicho) põe as views no eixo vertical e as horas desde a publicação no horizontal. Começa em 0 views na publicação; o trecho tracejado vai até a 1ª medição (só a média, não há pontos no meio) e a linha cheia liga as medições diárias das 07:15, cada uma na idade que o vídeo tinha naquele dia.
+
+**Ordenar por** (o painel explica a opção escolhida embaixo do seletor):
+
+| Opção | O que mede |
+|---|---|
+| Nota | z-score das views/h dentro do nicho + ln(1 + multiplicador): o mais quente agora |
+| Velocidade | views ÷ idade em horas; favorece vídeos novos |
+| Ganho em 24h | views ganhas desde a medição anterior (precisa de 2 dias de coleta) |
+| Multiplicador | views ÷ inscritos; acima de 1× passou o tamanho do canal |
+| × canal | views ÷ mediana dos últimos vídeos do canal; ≥ 3× furou a bolha |
+| Views | total de views, sem olhar idade nem canal |
+| Mais novos | menor idade primeiro |
+
+**Idade** = tempo desde que o vídeo foi publicado no YouTube (não desde que o sistema o achou); aparece em horas até 48 h e depois em dias + horas.
 
 **Assuntos em alta:** top 30 vídeos por nota em cada nicho (e top 30 geral sem duplicar IDs). Com pelo menos 5 vídeos, um termo precisa aparecer em dois títulos; em grupos menores, basta um. Extrai palavras e bigramas adjacentes, remove stopwords PT/EN, palavras de uma letra e números isolados. Cada termo recebe uma contribuição por título, igual à velocidade do vídeo. Exibe os 15 maiores pesos. É uma heurística lexical, sem IA ou interpretação semântica.
 
