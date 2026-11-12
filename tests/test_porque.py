@@ -170,7 +170,7 @@ class CanaisIntegracaoTest(unittest.TestCase):
         pagina=(self.raiz/'painel/index.html').read_text()
         self.assertIn('Por que bombou?',pagina)
         self.assertIn('value="fator_canal"',pagina)
-        self.assertIn('images=false',pagina)
+        self.assertIn('images=true',pagina)  # miniaturas carregam direto (pedido do Nei, 12/11)
         self.assertIn('data.porque.nichos[nicho]',pagina)
 
     def test_mediana_por_video_mesmo_canal(self):
