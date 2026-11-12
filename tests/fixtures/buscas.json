@@ -1,0 +1,191 @@
+{
+  "inteligência artificial": {
+    "entries": [
+      {
+        "id": "iaDemo00001",
+        "title": "Agentes de IA automatizam tarefas",
+        "channel": "Laboratório IA",
+        "channel_id": "UCdemo1",
+        "duration": 600,
+        "view_count": 24000
+      },
+      {
+        "id": "n8nDemo0001",
+        "title": "n8n automação com agentes inteligentes",
+        "channel": "Oficina n8n",
+        "channel_id": "UCdemo2",
+        "duration": 420,
+        "view_count": 12000
+      },
+      {
+        "id": "privado0001",
+        "title": "Vídeo privado de demonstração",
+        "channel": "Arquivo",
+        "duration": 90,
+        "view_count": 100
+      }
+    ]
+  },
+  "n8n automação": {
+    "entries": [
+      {
+        "id": "iaDemo00001",
+        "title": "Agentes de IA automatizam tarefas",
+        "channel": "Laboratório IA",
+        "channel_id": "UCdemo1",
+        "duration": 600,
+        "view_count": 24000
+      },
+      {
+        "id": "n8nDemo0001",
+        "title": "n8n automação com agentes inteligentes",
+        "channel": "Oficina n8n",
+        "channel_id": "UCdemo2",
+        "duration": 420,
+        "view_count": 12000
+      },
+      {
+        "id": "privado0001",
+        "title": "Vídeo privado de demonstração",
+        "channel": "Arquivo",
+        "duration": 90,
+        "view_count": 100
+      }
+    ]
+  },
+  "claude code": {
+    "entries": [
+      {
+        "id": "iaDemo00001",
+        "title": "Agentes de IA automatizam tarefas",
+        "channel": "Laboratório IA",
+        "channel_id": "UCdemo1",
+        "duration": 600,
+        "view_count": 24000
+      },
+      {
+        "id": "n8nDemo0001",
+        "title": "n8n automação com agentes inteligentes",
+        "channel": "Oficina n8n",
+        "channel_id": "UCdemo2",
+        "duration": 420,
+        "view_count": 12000
+      },
+      {
+        "id": "privado0001",
+        "title": "Vídeo privado de demonstração",
+        "channel": "Arquivo",
+        "duration": 90,
+        "view_count": 100
+      }
+    ]
+  },
+  "agentes de ia": {
+    "entries": [
+      {
+        "id": "iaDemo00001",
+        "title": "Agentes de IA automatizam tarefas",
+        "channel": "Laboratório IA",
+        "channel_id": "UCdemo1",
+        "duration": 600,
+        "view_count": 24000
+      },
+      {
+        "id": "n8nDemo0001",
+        "title": "n8n automação com agentes inteligentes",
+        "channel": "Oficina n8n",
+        "channel_id": "UCdemo2",
+        "duration": 420,
+        "view_count": 12000
+      },
+      {
+        "id": "privado0001",
+        "title": "Vídeo privado de demonstração",
+        "channel": "Arquivo",
+        "duration": 90,
+        "view_count": 100
+      }
+    ]
+  },
+  "vibe coding": {
+    "entries": [
+      {
+        "id": "iaDemo00001",
+        "title": "Agentes de IA automatizam tarefas",
+        "channel": "Laboratório IA",
+        "channel_id": "UCdemo1",
+        "duration": 600,
+        "view_count": 24000
+      },
+      {
+        "id": "n8nDemo0001",
+        "title": "n8n automação com agentes inteligentes",
+        "channel": "Oficina n8n",
+        "channel_id": "UCdemo2",
+        "duration": 420,
+        "view_count": 12000
+      },
+      {
+        "id": "privado0001",
+        "title": "Vídeo privado de demonstração",
+        "channel": "Arquivo",
+        "duration": 90,
+        "view_count": 100
+      }
+    ]
+  },
+  "ganhar dinheiro com ia": {
+    "entries": [
+      {
+        "id": "iaDemo00001",
+        "title": "Agentes de IA automatizam tarefas",
+        "channel": "Laboratório IA",
+        "channel_id": "UCdemo1",
+        "duration": 600,
+        "view_count": 24000
+      },
+      {
+        "id": "n8nDemo0001",
+        "title": "n8n automação com agentes inteligentes",
+        "channel": "Oficina n8n",
+        "channel_id": "UCdemo2",
+        "duration": 420,
+        "view_count": 12000
+      },
+      {
+        "id": "privado0001",
+        "title": "Vídeo privado de demonstração",
+        "channel": "Arquivo",
+        "duration": 90,
+        "view_count": 100
+      }
+    ]
+  },
+  "chatgpt": {
+    "entries": [
+      {
+        "id": "iaDemo00001",
+        "title": "Agentes de IA automatizam tarefas",
+        "channel": "Laboratório IA",
+        "channel_id": "UCdemo1",
+        "duration": 600,
+        "view_count": 24000
+      },
+      {
+        "id": "n8nDemo0001",
+        "title": "n8n automação com agentes inteligentes",
+        "channel": "Oficina n8n",
+        "channel_id": "UCdemo2",
+        "duration": 420,
+        "view_count": 12000
+      },
+      {
+        "id": "privado0001",
+        "title": "Vídeo privado de demonstração",
+        "channel": "Arquivo",
+        "duration": 90,
+        "view_count": 100
+      }
+    ]
+  }
+}

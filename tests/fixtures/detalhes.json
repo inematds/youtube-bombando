@@ -1,0 +1,20 @@
+{
+  "iaDemo00001": {
+    "upload_date": "20261111",
+    "view_count": 48000,
+    "like_count": 2200,
+    "comment_count": 180,
+    "channel_follower_count": 10000
+  },
+  "n8nDemo0001": {
+    "timestamp": 1794355200,
+    "view_count": 24000,
+    "like_count": 900,
+    "comment_count": 80,
+    "channel_follower_count": 4000
+  },
+  "privado0001": {
+    "erro": "Private video",
+    "indisponivel": true
+  }
+}

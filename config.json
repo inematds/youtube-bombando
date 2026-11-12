@@ -1,0 +1,45 @@
+{
+  "nichos": [
+    {
+      "nome": "inteligência artificial",
+      "busca": "inteligência artificial",
+      "ativo": true
+    },
+    {
+      "nome": "n8n automação",
+      "busca": "n8n automação",
+      "ativo": true
+    },
+    {
+      "nome": "claude code",
+      "busca": "claude code",
+      "ativo": true
+    },
+    {
+      "nome": "agentes de ia",
+      "busca": "agentes de ia",
+      "ativo": true
+    },
+    {
+      "nome": "vibe coding",
+      "busca": "vibe coding",
+      "ativo": true
+    },
+    {
+      "nome": "ganhar dinheiro com ia",
+      "busca": "ganhar dinheiro com ia",
+      "ativo": true
+    },
+    {
+      "nome": "chatgpt",
+      "busca": "chatgpt",
+      "ativo": true
+    }
+  ],
+  "por_nicho_busca": 40,
+  "dias_acompanhar": 7,
+  "max_detalhes_por_rodada": 250,
+  "pausa_s": 1.5,
+  "idioma": "pt",
+  "regiao": "BR"
+}

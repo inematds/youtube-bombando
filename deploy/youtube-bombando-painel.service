@@ -1,0 +1,13 @@
+[Unit]
+Description=Painel local YouTube bombando na porta 8795
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 -m http.server 8795 --bind 0.0.0.0 --directory "@REPO@/painel"
+Restart=on-failure
+RestartSec=5
+MemoryMax=1G
+Nice=10
+
+[Install]
+WantedBy=default.target

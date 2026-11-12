@@ -1,0 +1,96 @@
+"""HTML autônomo: filtros locais e miniaturas externas somente sob demanda."""
+import html
+from datetime import datetime, timedelta, timezone
+import json
+
+
+def data_local(instante):
+    """ISO UTC -> 'dd/mm/aaaa hh:mm' no horário de Brasília (UTC-3)."""
+    if not instante:
+        return 'Nenhuma'
+    quando = datetime.fromisoformat(instante).astimezone(timezone(timedelta(hours=-3)))
+    return quando.strftime('%d/%m/%Y %H:%M')
+
+
+def sparkline(fotos):
+    valores = [f['views'] for f in fotos if f['views'] is not None]
+    if not valores:
+        return '<span>Sem histórico</span>'
+    minimo, amplitude = min(valores), max(valores) - min(valores)
+    pontos = [(4 + i * 132 / max(len(valores) - 1, 1),
+               36 - (v - minimo) * 30 / (amplitude or 1)) for i, v in enumerate(valores)]
+    linha = ' '.join(f'{x:.1f},{y:.1f}' for x, y in pontos)
+    x, y = pontos[-1]
+    return (f'<svg viewBox="0 0 140 44" role="img" aria-label="Histórico de views: {html.escape(str(valores))}">'
+            f'<polyline points="{linha}" fill="none" stroke="currentColor" stroke-width="2"/>'
+            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="3" fill="currentColor"/></svg>')
+
+
+CSS = '''
+:root{color-scheme:dark;--bg:#0c0c10;--surface:#16161e;--border:#272730;--text:#e6e6e6;--muted:#a8a8b3;--accent:#FACC15}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px Inter,system-ui,sans-serif;line-height:1.5}
+main{max-width:1440px;margin:auto;padding:40px 32px}h1,h2,h3{font-family:Sora,system-ui,sans-serif;line-height:1.2}h1{font-size:clamp(2rem,5vw,3.6rem);margin:0 0 16px;letter-spacing:-.03em}h2{margin:40px 0 16px;font-size:1.4rem}p{max-width:72ch}.muted,small{color:var(--muted)}header{border-bottom:1px solid var(--border);padding-bottom:24px}.status{color:var(--accent)}
+button,select{font:inherit;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px 14px;min-height:44px;cursor:pointer}button:hover,a:hover{color:var(--accent)}button[aria-pressed=true]{background:var(--accent);color:#1a1206;border-color:var(--accent)}:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.controls{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-top:24px}.chips{display:flex;flex-wrap:wrap;gap:8px}.terms{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 32px}.term{overflow-wrap:anywhere}.bar{height:3px;background:var(--border);margin-top:5px}.bar span{display:block;height:3px;background:var(--accent)}
+.videos{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}th{text-align:left;color:var(--muted);font-weight:500;padding:12px 8px;border-bottom:1px solid var(--border)}td{padding:18px 8px;border-bottom:1px solid var(--border)}td:first-child{width:34%}a{color:var(--text);text-underline-offset:4px;overflow-wrap:anywhere}.title{font-weight:600}.thumb{width:104px;aspect-ratio:16/9;object-fit:cover;float:left;margin:0 14px 8px 0;background:var(--surface);border-radius:6px}.videos svg{width:110px;height:40px;color:var(--accent)}.hot{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}.hot article{border-top:1px solid var(--border);padding-top:12px}.hot h3{font-size:1rem;color:var(--muted)}.empty{padding:24px;background:var(--surface)}footer{margin-top:40px;color:var(--muted)}summary{cursor:pointer}li{overflow-wrap:anywhere}
+@media(max-width:1000px){main{padding:24px 16px}.videos thead{display:none}.videos,.videos tbody{display:block}.videos tr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:20px 0;border-bottom:1px solid var(--border)}.videos td{display:block;padding:0;border:0;min-width:0}.videos td:first-child{grid-column:1/-1;width:auto}.videos td:before{content:attr(data-label);display:block;font-size:12px;color:var(--muted)}.videos td:first-child:before{display:none}.terms,.hot{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.terms,.hot{grid-template-columns:1fr}.videos tr{grid-template-columns:repeat(2,minmax(0,1fr))}select{max-width:100%}}
+'''
+
+JS = '''
+const data=JSON.parse(document.getElementById('dados').textContent);
+let nicho='', images=true;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>n==null?'—':new Intl.NumberFormat('pt-BR',{maximumFractionDigits:1}).format(n);
+const score=v=>nicho?(v.notas[nicho]??0):v.nota;
+function render(){
+ const key=document.getElementById('ordem').value;
+ const list=data.videos.filter(v=>!nicho||v.nichos.includes(nicho)).sort((a,b)=>{
+   if(a.indisponivel!==b.indisponivel)return a.indisponivel-b.indisponivel;
+   return (key==='nota'?score(b):b[key]??-Infinity)-(key==='nota'?score(a):a[key]??-Infinity);
+ });
+ document.getElementById('lista').innerHTML=list.map(v=>`<tr><td>${images?`<img class="thumb" alt="" loading="lazy" src="https://i.ytimg.com/vi/${encodeURIComponent(v.id)}/mqdefault.jpg">`:''}<a class="title" href="https://www.youtube.com/watch?v=${encodeURIComponent(v.id)}" target="_blank" rel="noopener noreferrer">${esc(v.titulo)}</a><br><small>${esc(v.canal||'Canal não informado')}${v.indisponivel?' · Indisponível':''}</small></td><td data-label="Idade">${fmt(v.idade_h)} h</td><td data-label="Views">${fmt(v.views)}</td><td data-label="Views/h">${fmt(v.velocidade)}</td><td data-label="Ganho 24h">${fmt(v.ganho_24h)}</td><td data-label="Multiplicador">${fmt(v.multiplicador)}×</td><td data-label="Nota">${fmt(score(v))}</td><td data-label="Histórico">${v.sparkline}</td></tr>`).join('');
+ document.getElementById('vazio').hidden=list.length>0;
+ const terms=nicho?data.assuntos.nichos[nicho]||[]:data.assuntos.geral;
+ document.getElementById('termos').innerHTML=terms.length?terms.map(t=>`<div class="term">${esc(t.termo)} <small>${fmt(t.peso)} views/h</small><div class="bar"><span style="width:${100*t.peso/terms[0].peso}%"></span></div></div>`).join(''):'<p class="muted">Ainda não há velocidade suficiente para destacar assuntos.</p>';
+ document.getElementById('contagem').textContent=`${list.length} vídeos nesta seleção`;
+}
+document.querySelectorAll('[data-nicho]').forEach(b=>b.addEventListener('click',()=>{nicho=b.dataset.nicho;document.querySelectorAll('[data-nicho]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));render()}));
+document.getElementById('ordem').addEventListener('change',render);
+document.getElementById('imagens').addEventListener('click',function(){images=!images;this.setAttribute('aria-pressed',String(images));this.textContent=images?'Ocultar miniaturas':'Carregar miniaturas (internet)';render()});
+render();
+'''
+
+
+def gerar(dados, pasta, agora):
+    pasta.mkdir(parents=True, exist_ok=True)
+    historico = pasta / 'historico'
+    historico.mkdir(exist_ok=True)
+    for video in dados['videos']:
+        video['sparkline'] = sparkline(video['fotos'])
+    serializado = json.dumps(dados, ensure_ascii=False, allow_nan=False)
+    seguro = serializado.replace('&', '\\u0026').replace('<', '\\u003c').replace('>', '\\u003e')
+    chips = '<button data-nicho="" aria-pressed="true">Todos</button>' + ''.join(
+        f'<button data-nicho="{html.escape(n, quote=True)}" aria-pressed="false">{html.escape(n)}</button>' for n in dados['nichos'])
+    quentes = []
+    for nicho in dados['nichos']:
+        grupo = [v for v in dados['videos'] if nicho in v['nichos'] and not v['indisponivel'] and v['velocidade'] is not None]
+        if grupo:
+            v = max(grupo, key=lambda v: v['notas'][nicho])
+            quentes.append(f'<article><h3>{html.escape(nicho)}</h3><a href="https://www.youtube.com/watch?v={v["id"]}">{html.escape(v["titulo"])}</a>{v["sparkline"]}</article>')
+    rodada = dados.get('rodada') or {}
+    erros = rodada.get('erros', [])
+    status = f'{len(erros)} erros' if erros else 'ok'
+    erro_html = '<details><summary>Ocorrências da rodada</summary><ul>' + ''.join(f'<li>{html.escape(e)}</li>' for e in erros) + '</ul></details>' if erros else ''
+    pagina = f'''<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>YouTube bombando</title><style>{CSS}</style></head>
+<body><main><header><h1>YouTube bombando</h1><p class="muted">Descubra os assuntos que ganham força nos seus nichos.</p><p>Última rodada: {html.escape(data_local(rodada.get('instante')))} · {len(dados['videos'])} vídeos acompanhados · <span class="status">{status}</span>{' · Dados de exemplo (fixtures)' if rodada.get('fixtures') else ''}</p>{erro_html}</header>
+<nav class="controls chips" aria-label="Filtrar por nicho">{chips}</nav><div class="controls"><label for="ordem">Ordenar por</label><select id="ordem"><option value="nota">Nota</option><option value="velocidade">Velocidade</option><option value="ganho_24h">Ganho em 24h</option><option value="multiplicador">Multiplicador</option></select><button id="imagens" aria-pressed="true">Ocultar miniaturas</button></div>
+<section aria-labelledby="assuntos"><h2 id="assuntos">Assuntos em alta</h2><div class="terms" id="termos"></div></section>
+<section aria-labelledby="videos"><h2 id="videos">Vídeos em acompanhamento</h2><p id="contagem" class="muted" aria-live="polite"></p><table class="videos"><thead><tr><th>Vídeo / canal</th><th>Idade</th><th>Views</th><th>Views/h</th><th>Ganho 24h</th><th>Multiplicador</th><th>Nota</th><th>Histórico</th></tr></thead><tbody id="lista"></tbody></table><p id="vazio" class="empty" hidden>Nenhum vídeo nesta seleção.</p></section>
+<section><h2>Vídeo mais quente de cada nicho</h2><div class="hot">{''.join(quentes) or '<p class="muted">Aguardando fotos dos vídeos.</p>'}</div></section><footer>— indica dado ainda não disponível. Miniaturas vêm do YouTube (internet). Links abrem o YouTube.</footer><noscript>Ative JavaScript para filtrar e consultar a tabela. Os destaques acima continuam disponíveis.</noscript></main>
+<script id="dados" type="application/json">{seguro}</script><script>{JS}</script></body></html>'''
+    for destino, conteudo in [(pasta / 'dados.json', serializado), (pasta / 'index.html', pagina),
+                              (historico / (agora.date().isoformat() + '.html'), pagina)]:
+        temporario = destino.with_suffix(destino.suffix + '.tmp')
+        temporario.write_text(conteudo, encoding='utf-8')
+        temporario.replace(destino)

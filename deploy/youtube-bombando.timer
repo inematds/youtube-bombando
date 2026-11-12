@@ -1,0 +1,10 @@
+[Unit]
+Description=Pesquisa YouTube diariamente às 07:15
+
+[Timer]
+OnCalendar=*-*-* 07:15:00
+Persistent=true
+Unit=youtube-bombando.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,5 @@
+dados/*
+!dados/.gitkeep
+painel/
+__pycache__/
+*.py[cod]

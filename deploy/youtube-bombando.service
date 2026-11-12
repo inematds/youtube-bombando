@@ -1,0 +1,10 @@
+[Unit]
+Description=Descoberta e acompanhamento diário do YouTube
+
+[Service]
+Type=oneshot
+WorkingDirectory=@REPO@
+ExecStart=/usr/bin/python3 "@REPO@/bombando/rodada.py"
+TimeoutStartSec=45min
+MemoryMax=1G
+Nice=10
