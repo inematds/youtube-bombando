@@ -271,7 +271,7 @@
       <h1><span class="amb">Radar de lo que explota:</span> descubre cada mañana qué está explotando en YouTube en tu tema, y por qué</h1>
       <p class="lead">Grabas, te esmeras, y el video no se mueve. Mientras tanto, un canal pequeño del mismo tema hace cientos de veces lo normal para él. El <strong>radar de lo que explota</strong> te muestra, antes de grabar, qué está creciendo y si creció por el tema (puedes aprovechar la idea) o solo porque el canal es grande (no sirve).</p>
       <div class="cta">
-        <a class="btn" href="#painel">Ver el panel en 3 minutos</a>
+        <a class="btn" href="#painel">Ver cómo es el panel</a>
         <a class="btn ghost" href="https://github.com/inematds/youtube-bombando" target="_blank" rel="noopener">Ver en GitHub</a>
       </div>
     </div>
@@ -335,7 +335,7 @@
 <section id="acao"><div class="wrap">
   <span class="chip">Cómo usar la idea</span>
   <h2>Del panel a tu <span class="amb">próximo video</span></h2>
-  <div class="phase"><div class="tag">1</div><div class="d"><strong>Mira “Rompieron la burbuja”</strong><span>Son canales pequeños y medianos que hicieron mucho más que lo normal. Su tema y su formato son los mejores modelos para estudiar.</span></div></div>
+  <div class="phase"><div class="tag">1</div><div class="d"><strong>Mira “Rompieron la burbuja” (“Furaram a bolha”: el panel está en portugués)</strong><span>Son canales pequeños y medianos que hicieron mucho más que lo normal. Su tema y su formato son los mejores modelos para estudiar.</span></div></div>
   <div class="phase"><div class="tag">2</div><div class="d"><strong>Revisa los temas en alza de tu nicho</strong><span>Filtra por tu tema. Las palabras que aparecen en varios títulos que crecen rápido indican un tema caliente esta semana.</span></div></div>
   <div class="phase"><div class="tag">3</div><div class="d"><strong>Ignora el “quién publica”</strong><span>Un video de canal grande a su ritmo normal muestra la fuerza del canal, no del tema. No es referencia para ti.</span></div></div>
   <div class="phase"><div class="tag">4</div><div class="d"><strong>Sigue el gráfico durante algunos días</strong><span>A partir del 2.º día aparecen la ganancia en 24 h y la curva real. Un tema que sigue subiendo al 3.er día todavía tiene espacio.</span></div></div>
@@ -378,20 +378,24 @@
   <p class="sub">Ninguna clave, ningún paquete de Python extra. El horario automático usa el systemd de Linux; en Mac y Windows corres la recolección a mano (o con el programador de tareas del sistema).</p>
   <div class="grid g3">
     <div class="card"><h3>🐍 Python 3.9+</h3><pre><span class="k">python3 --version</span></pre></div>
-    <div class="card"><h3>📥 yt-dlp</h3><p>Instálalo y mantenlo actualizado (YouTube cambia y yt-dlp lo acompaña).</p><pre><span class="k">python3 -m pip install -U yt-dlp</span>
+    <div class="card"><h3>📥 yt-dlp</h3><p>Instálalo y mantenlo actualizado (YouTube cambia y yt-dlp lo acompaña).</p><pre><span class="c"># Ubuntu/Debian recientes</span>
+<span class="k">sudo apt install pipx &amp;&amp; pipx install yt-dlp</span>
+<span class="c"># otros sistemas</span>
+<span class="k">python3 -m pip install -U yt-dlp</span>
 <span class="k">yt-dlp --version</span></pre></div>
     <div class="card"><h3>📦 El proyecto</h3><p>Sin git: <a href="https://github.com/inematds/youtube-bombando/archive/refs/heads/main.zip">descarga el ZIP</a>.</p><pre><span class="k">git clone https://github.com/inematds/youtube-bombando</span>
-<span class="k">cd youtube-bombando</span></pre></div>
+<span class="k">cd youtube-bombando</span>
+<span class="c"># ¿descargaste el ZIP? la carpeta es youtube-bombando-main</span></pre></div>
   </div>
 </div></section>
 
 <section id="guia"><div class="wrap">
   <span class="chip">Guía de uso · paso a paso</span>
-  <h2>En <span class="amb">15 minutos</span></h2>
+  <h2><span class="amb">Paso a paso</span></h2>
 
   <div class="step"><div class="b">1</div><div>
     <h3>Prueba sin internet</h3>
-    <p>Las pruebas y una ronda con datos de ejemplo, sin tocar YouTube. El panel de prueba va a <code>dados/teste/painel/</code>.</p>
+    <p>Las pruebas y una ronda con datos de ejemplo, sin tocar YouTube. El panel de prueba va a <code>dados/teste/painel/</code>. El final esperado es <code>rodada ok: 7 nichos, 3 novos, 2 fotos, 1 erros</code>: ese 1 error es a propósito (un video privado de ejemplo).</p>
     <pre><span class="k">python3 -m unittest discover -s tests</span>
 <span class="k">python3 bombando/rodada.py --fixtures tests/fixtures</span>
 <span class="c"># abre dados/teste/painel/index.html en el navegador</span></pre>
@@ -399,8 +403,14 @@
 
   <div class="step"><div class="b">2</div><div>
     <h3>Elige tus temas</h3>
-    <p>Edita <code>config.json</code>. Cada tema tiene un nombre, el término de búsqueda y si está activo.</p>
-    <pre>{ <span class="s">"nome"</span>: <span class="s">"recetas fáciles"</span>, <span class="s">"busca"</span>: <span class="s">"receta fácil"</span>, <span class="s">"ativo"</span>: true }</pre>
+    <p>Edita <code>config.json</code>. Cada tema tiene un nombre, el término de búsqueda y si está activo. La lista <code>"nichos"</code> ya trae 7 temas de IA: cámbialos por los tuyos o pon <code>"ativo": false</code> en los que no quieras. Coma entre los ítems, ninguna después del último; el resto del archivo queda igual.</p>
+    <pre>{
+  <span class="s">"nichos"</span>: [
+    { <span class="s">"nome"</span>: <span class="s">"recetas fáciles"</span>, <span class="s">"busca"</span>: <span class="s">"receta fácil"</span>, <span class="s">"ativo"</span>: true },
+    { <span class="s">"nome"</span>: <span class="s">"postres"</span>, <span class="s">"busca"</span>: <span class="s">"postre fácil"</span>, <span class="s">"ativo"</span>: true }
+  ],
+  <span class="c">…</span>
+}</pre>
   </div></div>
 
   <div class="step"><div class="b">3</div><div>
@@ -412,14 +422,14 @@
 
   <div class="step"><div class="b">4</div><div>
     <h3>Abre el panel</h3>
-    <p>El panel es un solo archivo. Ábrelo directo o sírvelo en el puerto 8795.</p>
+    <p>El panel es un solo archivo. Ábrelo directo o sírvelo en el puerto 8795. Sin servidor: abre <code>painel/index.html</code> con doble clic. Queda vacío hasta que termine la primera recolección.</p>
     <pre><span class="k">python3 -m http.server 8795 --directory painel</span>
 <span class="c"># http://localhost:8795</span></pre>
   </div></div>
 
   <div class="step"><div class="b">5</div><div>
     <h3>Déjalo corriendo todos los días (Linux)</h3>
-    <p>Instala el horario de las 07:15 y el servidor del panel como servicios de tu usuario. Puedes repetirlo sin problema.</p>
+    <p>Instala el horario de las 07:15 y el servidor del panel como servicios de tu usuario. Puedes repetirlo sin problema. La computadora tiene que estar encendida; si está apagada a las 07:15, la recolección corre en cuanto se encienda.</p>
     <pre><span class="k">bash deploy/instalar.sh</span>
 <span class="k">systemctl --user list-timers youtube-bombando.timer</span></pre>
   </div></div>

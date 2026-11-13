@@ -272,7 +272,7 @@
       <h1><span class="amb">The trending radar:</span> find out every morning what is blowing up on YouTube in your niche, and why</h1>
       <p class="lead">You record, you put in the effort, and the video goes nowhere. Meanwhile, a small channel on the same topic gets hundreds of times its usual views. <strong>The trending radar</strong> shows you, before you record, what is growing and whether it grew because of the topic (you can use the idea) or just because the channel is big (you can't).</p>
       <div class="cta">
-        <a class="btn" href="#painel">See the panel in 3 minutes</a>
+        <a class="btn" href="#painel">See what the panel looks like</a>
         <a class="btn ghost" href="https://github.com/inematds/youtube-bombando" target="_blank" rel="noopener">See it on GitHub</a>
       </div>
     </div>
@@ -336,7 +336,7 @@
 <section id="acao"><div class="wrap">
   <span class="chip">How to use the idea</span>
   <h2>From the panel to your <span class="amb">next video</span></h2>
-  <div class="phase"><div class="tag">1</div><div class="d"><strong>Look at “Burst the bubble”</strong><span>These are small and mid-size channels that did far better than usual. Their topic and format are the best models to study.</span></div></div>
+  <div class="phase"><div class="tag">1</div><div class="d"><strong>Look at “Burst the bubble” (“Furaram a bolha”: the panel itself is in Portuguese)</strong><span>These are small and mid-size channels that did far better than usual. Their topic and format are the best models to study.</span></div></div>
   <div class="phase"><div class="tag">2</div><div class="d"><strong>Check the hot topics in your niche</strong><span>Filter by your topic. Words that appear in several fast-growing titles point to a hot theme this week.</span></div></div>
   <div class="phase"><div class="tag">3</div><div class="d"><strong>Ignore “who posts”</strong><span>A big channel's video at its normal pace shows the strength of the channel, not of the topic. It's not a reference for you.</span></div></div>
   <div class="phase"><div class="tag">4</div><div class="d"><strong>Follow the chart for a few days</strong><span>From the 2nd day on you get the 24h gain and the real curve. A topic still climbing on day 3 still has room.</span></div></div>
@@ -379,20 +379,24 @@
   <p class="sub">No key, no extra Python package. The automatic schedule uses Linux systemd; on Mac and Windows you run the collection by hand (or with the system scheduler).</p>
   <div class="grid g3">
     <div class="card"><h3>🐍 Python 3.9+</h3><pre><span class="k">python3 --version</span></pre></div>
-    <div class="card"><h3>📥 yt-dlp</h3><p>Install it and keep it up to date (YouTube changes and yt-dlp keeps up).</p><pre><span class="k">python3 -m pip install -U yt-dlp</span>
+    <div class="card"><h3>📥 yt-dlp</h3><p>Install it and keep it up to date (YouTube changes and yt-dlp keeps up).</p><pre><span class="c"># recent Ubuntu/Debian</span>
+<span class="k">sudo apt install pipx &amp;&amp; pipx install yt-dlp</span>
+<span class="c"># other systems</span>
+<span class="k">python3 -m pip install -U yt-dlp</span>
 <span class="k">yt-dlp --version</span></pre></div>
     <div class="card"><h3>📦 The project</h3><p>No git: <a href="https://github.com/inematds/youtube-bombando/archive/refs/heads/main.zip">download the ZIP</a>.</p><pre><span class="k">git clone https://github.com/inematds/youtube-bombando</span>
-<span class="k">cd youtube-bombando</span></pre></div>
+<span class="k">cd youtube-bombando</span>
+<span class="c"># downloaded the ZIP? the folder is youtube-bombando-main</span></pre></div>
   </div>
 </div></section>
 
 <section id="guia"><div class="wrap">
   <span class="chip">User guide · step by step</span>
-  <h2>In <span class="amb">15 minutes</span></h2>
+  <h2><span class="amb">Step by step</span></h2>
 
   <div class="step"><div class="b">1</div><div>
     <h3>Test without internet</h3>
-    <p>The tests and a run with sample data, without touching YouTube. The test panel goes to <code>dados/teste/painel/</code>.</p>
+    <p>The tests and a run with sample data, without touching YouTube. The test panel goes to <code>dados/teste/painel/</code>. The expected ending is <code>rodada ok: 7 nichos, 3 novos, 2 fotos, 1 erros</code>: that 1 error is on purpose (a sample private video).</p>
     <pre><span class="k">python3 -m unittest discover -s tests</span>
 <span class="k">python3 bombando/rodada.py --fixtures tests/fixtures</span>
 <span class="c"># open dados/teste/painel/index.html in your browser</span></pre>
@@ -400,8 +404,14 @@
 
   <div class="step"><div class="b">2</div><div>
     <h3>Choose your topics</h3>
-    <p>Edit <code>config.json</code>. Each topic has a name, the search term and whether it's active.</p>
-    <pre>{ <span class="s">"nome"</span>: <span class="s">"easy recipes"</span>, <span class="s">"busca"</span>: <span class="s">"easy recipe"</span>, <span class="s">"ativo"</span>: true }</pre>
+    <p>Edit <code>config.json</code>. Each topic has a name, the search term and whether it's active. The <code>"nichos"</code> list comes with 7 AI topics: replace them with yours or set <code>"ativo": false</code> on the ones you don't want. Comma between items, none after the last one; leave the rest of the file as it is.</p>
+    <pre>{
+  <span class="s">"nichos"</span>: [
+    { <span class="s">"nome"</span>: <span class="s">"easy recipes"</span>, <span class="s">"busca"</span>: <span class="s">"easy recipe"</span>, <span class="s">"ativo"</span>: true },
+    { <span class="s">"nome"</span>: <span class="s">"desserts"</span>, <span class="s">"busca"</span>: <span class="s">"easy dessert"</span>, <span class="s">"ativo"</span>: true }
+  ],
+  <span class="c">…</span>
+}</pre>
   </div></div>
 
   <div class="step"><div class="b">3</div><div>
@@ -413,14 +423,14 @@
 
   <div class="step"><div class="b">4</div><div>
     <h3>Open the panel</h3>
-    <p>The panel is a single file. Open it directly or serve it on port 8795.</p>
+    <p>The panel is a single file. Open it directly or serve it on port 8795. No server: double-click <code>painel/index.html</code>. It stays empty until the first collection finishes.</p>
     <pre><span class="k">python3 -m http.server 8795 --directory painel</span>
 <span class="c"># http://localhost:8795</span></pre>
   </div></div>
 
   <div class="step"><div class="b">5</div><div>
     <h3>Leave it running every day (Linux)</h3>
-    <p>Installs the 7:15 AM schedule and the panel server as services for your user. Safe to run again.</p>
+    <p>Installs the 7:15 AM schedule and the panel server as services for your user. Safe to run again. The computer must be on; if it is off at 7:15, the collection runs as soon as it starts.</p>
     <pre><span class="k">bash deploy/instalar.sh</span>
 <span class="k">systemctl --user list-timers youtube-bombando.timer</span></pre>
   </div></div>

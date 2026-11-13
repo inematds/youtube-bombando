@@ -272,7 +272,7 @@
       <h1><span class="amb">Radar do que bomba:</span> saiba toda manhã o que está bombando no YouTube no seu assunto, e por quê</h1>
       <p class="lead">Você grava, capricha, e o vídeo não sai do lugar. Enquanto isso, um canal pequeno no mesmo assunto faz centenas de vezes o normal dele. O <strong>radar do que bomba</strong> mostra, antes de você gravar, o que está crescendo e se cresceu pelo assunto (dá para aproveitar a ideia) ou só porque o canal é grande (não dá).</p>
       <div class="cta">
-        <a class="btn" href="#painel">Ver o painel em 3 minutos</a>
+        <a class="btn" href="#painel">Ver como é o painel</a>
         <a class="btn ghost" href="https://github.com/inematds/youtube-bombando" target="_blank" rel="noopener">Ver no GitHub</a>
       </div>
     </div>
@@ -311,7 +311,7 @@
 <section id="porque"><div class="wrap">
   <span class="chip">Por que bombou?</span>
   <h2>Foi o assunto, o canal <span class="amb">ou quem fala?</span></h2>
-  <p class="sub">Um vídeo com 1 milhão de views num canal de 5 milhões de inscritos não ensina nada: a audiência já estava lá. O mesmo milhão num canal de 7 mil inscritos ensina muito. Por isso o painel compara cada vídeo com o normal do próprio canal (a mediana dos últimos vídeos dele).</p>
+  <p class="sub">Um vídeo com 1 milhão de views num canal de 5 milhões de inscritos não ensina nada: a audiência já estava lá. O mesmo milhão num canal de 7 mil inscritos ensina muito. Por isso o painel compara cada vídeo com o normal do próprio canal (a mediana: o valor do meio entre os últimos vídeos dele).</p>
   <div class="grid g3">
     <div class="card"><h3>🟨 Conteúdo</h3><p>Fez <strong>3 vezes ou mais</strong> o normal do canal. O assunto puxou. É a ideia que vale estudar e fazer do seu jeito.</p></div>
     <div class="card"><h3>🏢 Quem posta</h3><p>Canal grande (mais de 500 mil inscritos) no ritmo de sempre. A audiência já existia; copiar o tema não traz o mesmo resultado.</p></div>
@@ -379,20 +379,24 @@
   <p class="sub">Nenhuma chave, nenhum pacote Python extra. O horário automático usa o systemd do Linux; no Mac e no Windows você roda a coleta à mão (ou pelo agendador do sistema).</p>
   <div class="grid g3">
     <div class="card"><h3>🐍 Python 3.9+</h3><pre><span class="k">python3 --version</span></pre></div>
-    <div class="card"><h3>📥 yt-dlp</h3><p>Instale e mantenha atualizado (o YouTube muda e o yt-dlp acompanha).</p><pre><span class="k">python3 -m pip install -U yt-dlp</span>
+    <div class="card"><h3>📥 yt-dlp</h3><p>Instale e mantenha atualizado (o YouTube muda e o yt-dlp acompanha).</p><pre><span class="c"># Ubuntu/Debian recentes</span>
+<span class="k">sudo apt install pipx &amp;&amp; pipx install yt-dlp</span>
+<span class="c"># outros sistemas</span>
+<span class="k">python3 -m pip install -U yt-dlp</span>
 <span class="k">yt-dlp --version</span></pre></div>
     <div class="card"><h3>📦 O projeto</h3><p>Sem git: <a href="https://github.com/inematds/youtube-bombando/archive/refs/heads/main.zip">baixe o ZIP</a>.</p><pre><span class="k">git clone https://github.com/inematds/youtube-bombando</span>
-<span class="k">cd youtube-bombando</span></pre></div>
+<span class="k">cd youtube-bombando</span>
+<span class="c"># baixou o ZIP? a pasta é youtube-bombando-main</span></pre></div>
   </div>
 </div></section>
 
 <section id="guia"><div class="wrap">
   <span class="chip">Guia de uso · passo a passo</span>
-  <h2>Em <span class="amb">15 minutos</span></h2>
+  <h2><span class="amb">Passo a passo</span></h2>
 
   <div class="step"><div class="b">1</div><div>
     <h3>Teste sem internet</h3>
-    <p>Os testes e uma rodada com dados de exemplo, sem tocar no YouTube. O painel de teste vai para <code>dados/teste/painel/</code>.</p>
+    <p>Os testes e uma rodada com dados de exemplo, sem tocar no YouTube. O painel de teste vai para <code>dados/teste/painel/</code>. O fim esperado é <code>rodada ok: 7 nichos, 3 novos, 2 fotos, 1 erros</code>: esse 1 erro é de propósito (um vídeo privado de exemplo).</p>
     <pre><span class="k">python3 -m unittest discover -s tests</span>
 <span class="k">python3 bombando/rodada.py --fixtures tests/fixtures</span>
 <span class="c"># abra dados/teste/painel/index.html no navegador</span></pre>
@@ -400,8 +404,14 @@
 
   <div class="step"><div class="b">2</div><div>
     <h3>Escolha os seus assuntos</h3>
-    <p>Edite <code>config.json</code>. Cada assunto tem um nome, o termo de busca e se está ativo.</p>
-    <pre>{ <span class="s">"nome"</span>: <span class="s">"receitas fáceis"</span>, <span class="s">"busca"</span>: <span class="s">"receita fácil"</span>, <span class="s">"ativo"</span>: true }</pre>
+    <p>Edite <code>config.json</code>. Cada assunto tem um nome, o termo de busca e se está ativo. A lista <code>"nichos"</code> já vem com 7 assuntos de IA: troque-os pelos seus ou marque <code>"ativo": false</code> nos que não quiser. Vírgula entre os itens, nenhuma depois do último; o resto do arquivo fica como está.</p>
+    <pre>{
+  <span class="s">"nichos"</span>: [
+    { <span class="s">"nome"</span>: <span class="s">"receitas fáceis"</span>, <span class="s">"busca"</span>: <span class="s">"receita fácil"</span>, <span class="s">"ativo"</span>: true },
+    { <span class="s">"nome"</span>: <span class="s">"doces"</span>, <span class="s">"busca"</span>: <span class="s">"doce fácil"</span>, <span class="s">"ativo"</span>: true }
+  ],
+  <span class="c">…</span>
+}</pre>
   </div></div>
 
   <div class="step"><div class="b">3</div><div>
@@ -413,14 +423,14 @@
 
   <div class="step"><div class="b">4</div><div>
     <h3>Abra o painel</h3>
-    <p>O painel é um arquivo só. Abra direto ou sirva na porta 8795.</p>
+    <p>O painel é um arquivo só. Abra direto ou sirva na porta 8795. Sem servidor: abra <code>painel/index.html</code> com dois cliques. Ele fica vazio até a primeira coleta terminar.</p>
     <pre><span class="k">python3 -m http.server 8795 --directory painel</span>
 <span class="c"># http://localhost:8795</span></pre>
   </div></div>
 
   <div class="step"><div class="b">5</div><div>
     <h3>Deixe rodando todo dia (Linux)</h3>
-    <p>Instala o horário das 07:15 e o servidor do painel como serviços do seu usuário. Pode repetir sem problema.</p>
+    <p>Instala o horário das 07:15 e o servidor do painel como serviços do seu usuário. Pode repetir sem problema. O computador precisa estar ligado; se estiver desligado às 07:15, a coleta roda assim que ele ligar.</p>
     <pre><span class="k">bash deploy/instalar.sh</span>
 <span class="k">systemctl --user list-timers youtube-bombando.timer</span></pre>
   </div></div>
