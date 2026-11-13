@@ -2,6 +2,7 @@
 
 | data | o que quebrou | menor correção | prompt ou infra |
 |---|---|---|---|
+| 2026-11-12 | timer da coleta podia não achar o yt-dlp de ~/.local/bin (PATH do systemd) | Environment=PATH na unit | infra |
 | 2026-11-12 | Linha de base dos canais absurda (OpenAI mediana 34 views, fator 38.000×): yt-dlp com lang=pt lê "3,4 mil" como 34 | Tirar youtube:lang do comando; conferir com canal grande | infra |
 | 2026-11-12 | Painel carregava miniaturas automaticamente ao abrir, contrariando o modo offline | Iniciar imagens desativadas e manter carregamento explícito no botão | prompt |
 | 2026-11-12 | Timer não armava: instalar.sh punha aspas no WorkingDirectory (systemd recusa) | Tirar a troca de aspas; conferir com systemd-analyze --user verify | prompt |

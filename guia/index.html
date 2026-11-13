@@ -436,6 +436,7 @@
     <p>Instala o horário das 07:15 e o servidor do painel como serviços do seu usuário. Pode repetir sem problema. O computador precisa estar ligado e com você conectado; se estava desligado às 07:15, a coleta roda assim que você ligar e entrar nele. O painel fica visível para os outros aparelhos da sua rede de casa (porta 8795).</p>
     <pre><span class="k">bash deploy/instalar.sh</span>
 <span class="k">systemctl --user list-timers youtube-bombando.timer</span></pre>
+    <p class="mut" style="margin-top:8px">Para conferir se a coleta automática rodou: <code>journalctl --user -u youtube-bombando</code>. Para desligar tudo: <code>systemctl --user disable --now youtube-bombando.timer youtube-bombando-painel.service</code>.</p>
   </div></div>
 
   <div class="step"><div class="b">6</div><div>

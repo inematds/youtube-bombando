@@ -436,6 +436,7 @@
     <p>Installs the 7:15 AM schedule and the panel server as services for your user. Safe to run again. The computer must be on and you logged in; if it was off at 7:15, the collection runs as soon as you turn it on and log in. The panel is visible to other devices on your home network (port 8795).</p>
     <pre><span class="k">bash deploy/instalar.sh</span>
 <span class="k">systemctl --user list-timers youtube-bombando.timer</span></pre>
+    <p class="mut" style="margin-top:8px">To check that the automatic collection ran: <code>journalctl --user -u youtube-bombando</code>. To turn everything off: <code>systemctl --user disable --now youtube-bombando.timer youtube-bombando-painel.service</code>.</p>
   </div></div>
 
   <div class="step"><div class="b">6</div><div>

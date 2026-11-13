@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.1 — 2026-11-12
+
+- Unit da coleta com `Environment=PATH=%h/.local/bin:…`: yt-dlp instalado por pipx/pip --user fica fora do PATH padrão do systemd (achado do revisor do guia).
+- Guia PT/EN/ES, README trilingue e Pages via Actions.
+
 ## 1.2.0 — 2026-11-12
 
 - Vídeo mais quente de cada nicho com thumb, views, idade, views/h, × canal, ganho 24h, categoria e gráfico de crescimento.

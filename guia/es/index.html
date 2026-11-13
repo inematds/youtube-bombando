@@ -435,6 +435,7 @@
     <p>Instala el horario de las 07:15 y el servidor del panel como servicios de tu usuario. Puedes repetirlo sin problema. La computadora tiene que estar encendida y con tu sesión abierta; si estaba apagada a las 07:15, la recolección corre en cuanto la enciendas y entres. El panel se ve desde los otros aparatos de tu red de casa (puerto 8795).</p>
     <pre><span class="k">bash deploy/instalar.sh</span>
 <span class="k">systemctl --user list-timers youtube-bombando.timer</span></pre>
+    <p class="mut" style="margin-top:8px">Para ver si la recolección automática corrió: <code>journalctl --user -u youtube-bombando</code>. Para apagar todo: <code>systemctl --user disable --now youtube-bombando.timer youtube-bombando-painel.service</code>.</p>
   </div></div>
 
   <div class="step"><div class="b">6</div><div>

@@ -8,3 +8,5 @@ ExecStart=/usr/bin/python3 "@REPO@/bombando/rodada.py"
 TimeoutStartSec=45min
 MemoryMax=1G
 Nice=10
+# yt-dlp instalado por pipx/pip --user fica em ~/.local/bin, fora do PATH padrão do systemd
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
