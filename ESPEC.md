@@ -1,7 +1,7 @@
 # youtube-bombando — especificação (v1.0.0)
 
 Sistema local que descobre, todo dia, **quais assuntos e vídeos estão bombando no YouTube** em nichos escolhidos e mostra num **painel**.
-É a versão em código do workflow n8n "als3 / 12.5 Youtube Faceless Video Research" (grupo INEMA.N8N, tópico 5057):
+Dois fluxos:
 fluxo 1 = buscar vídeos recentes por nicho; fluxo 2 = registrar as views de cada vídeo por dia para ver quem cresce mais rápido.
 
 ## Regras duras
@@ -38,7 +38,7 @@ fluxo 1 = buscar vídeos recentes por nicho; fluxo 2 = registrar as views de cad
 - `deploy/youtube-bombando-painel.service` (systemd --user): `python3 -m http.server 8795 --bind 0.0.0.0 --directory <repo>/painel`.
 - `deploy/instalar.sh` — copia as units para `~/.config/systemd/user/`, `daemon-reload`, `enable --now` do timer e do painel. Idempotente.
 - `tests/test_metricas.py` + `tests/test_rodada_fixtures.py` (unittest): métricas com números conhecidos; rodada inteira com `--fixtures` gera `painel/index.html` contendo os títulos esperados e um `<svg` de sparkline; vídeo indisponível não quebra.
-- `README.md` em PT com: o que é, de onde veio (workflow n8n als3, sem citar link), como instalar, como mudar nichos, explicação das métricas e da nota, e a seção **"O processo, do início ao fim"** com passos numerados, comando e quem faz (🧠 sessão com o Nei · ⚙️ script/timer).
+- `README.md` em PT com: o que é, como instalar, como mudar nichos, explicação das métricas e da nota, e a seção **"O processo, do início ao fim"** com passos numerados, comando e quem faz (🧠 sessão com o Nei · ⚙️ script/timer).
 - `CLAUDE.md` curto (o que é, comandos, regras duras acima) terminando com as seções `## Self-learning` (quando corrigido, gravar a lição no topo do LESSONS.md) e `## Lessons` (aponta para LESSONS.md). Criar `LESSONS.md` e `FALHAS.md` vazios com cabeçalho.
 - `VERSION` com `1.0.0` e `CHANGELOG.md`.
 

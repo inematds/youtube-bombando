@@ -1,9 +1,20 @@
-# YouTube bombando
+# YouTube bombando — radar do que bomba
 
-Sistema local de pesquisa que descobre vídeos recentes por nicho, acompanha suas views diariamente e mostra quais vídeos e assuntos ganham força. Nasceu do workflow n8n **als3 / 12.5 Youtube Faceless Video Research**: descoberta por nicho e registro diário de views, agora em Python e SQLite.
+**🇧🇷 [Português](README.md) · 🇺🇸 [English](README.en.md) · 🇪🇸 [Español](README.es.md)**
+
+[![Radar do que bomba](guia/assets/banner.jpg)](https://inematds.github.io/youtube-bombando/guia/)
+
+## O que é
+
+O **youtube-bombando** é um pequeno sistema que roda sozinho no seu computador, toda manhã. Ele procura no YouTube os vídeos da semana nos assuntos que você escolher, anota as views de cada um por 7 dias e monta um painel com o que está crescendo mais rápido. Para cada vídeo, ele compara as views com o normal do próprio canal e diz se o sinal é de **conteúdo**, de **quem posta** (canal grande) ou de **quem fala** (convidado). É para quem grava vídeo ou quer começar um canal. Precisa só de Python e de uma ferramenta grátis que lê o YouTube; não usa chave nem API paga.
+
+## 📖 Guia de uso
+
+Guia completo (landing + passo a passo): **https://inematds.github.io/youtube-bombando/guia/**
+
+## Requisitos
 
 Python 3.9+ e biblioteca padrão, sem pip, API ou chaves. A coleta real usa o executável `yt-dlp` disponível no PATH; os testes não o executam. Linux com systemd de usuário é necessário apenas para a instalação do timer. A pesquisa real requer internet; o modo fixtures e o painel funcionam offline.
-
 ## Começar localmente
 
 ```bash
@@ -49,9 +60,9 @@ Edite `config.json`. Cada item de `nichos` contém `nome`, `busca` e `ativo` (bo
 | `por_nicho_busca` | 40 | Máximo de resultados por busca semanal |
 | `dias_acompanhar` | 7 | Janela desde a primeira descoberta |
 | `max_detalhes_por_rodada` | 250 | Teto de consultas de detalhes |
-| `max_canais_por_rodada` | 120 | Teto de tentativas de consulta de canais por rodada |
+| `max_canais_por_rodada` | 120 (este repo usa 200) | Teto de tentativas de consulta de canais por rodada |
 | `pausa_s` | 1.5 | Intervalo mínimo entre fim e início das chamadas |
-| `idioma` | pt | Idioma solicitado ao extrator YouTube |
+| `idioma` | pt | Reservado; não é passado ao yt-dlp (com `lang=pt` ele lê "3,4 mil" como 34) |
 | `regiao` | BR | País informado ao mecanismo geo-bypass do yt-dlp |
 
 A região não garante resultados geolocalizados; o YouTube também considera a conexão. O filtro semanal é o parâmetro de pesquisa solicitado ao YouTube. O sistema preserva os resultados devolvidos pelo extrator.

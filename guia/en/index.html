@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<!-- TEMPLATE projetos-landing-guia. Replace placeholders and content. DO NOT rewrite the CSS.
+     TRILINGUAL: this file is the EN version (guia/en/index.html). The PT original is guia/index.html
+     and the ES copy is guia/es/index.html: lang="en"/"es", selector with a.on on the language,
+     selector hrefs ../ and ../es/ (or ../en/), and images assets/ -> ../assets/. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The trending radar — find out every morning what is blowing up on YouTube in your niche</title>
+<meta name="description" content="Free project (youtube-bombando): every morning it looks up the week's videos in your topics, shows what is growing fastest, a growth chart for each video and whether it took off because of the content, the channel or the guest. Python, no key.">
+<link rel="alternate" hreflang="pt-BR" href="https://inematds.github.io/youtube-bombando/guia/">
+<link rel="alternate" hreflang="en" href="https://inematds.github.io/youtube-bombando/guia/en/">
+<link rel="alternate" hreflang="es" href="https://inematds.github.io/youtube-bombando/guia/es/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0c0c10; --bg2:#14141b; --card:#16161e; --line:#272730;
+    --txt:#e9e9ee; --mut:#9a9aa6; --amb:#E2A23B; --amb2:#f0c070; --sky:#38bdf8; --pro:#cbd5e1;
+    color-scheme:dark;
+  }
+  body.light{
+    --bg:#f6f7f9; --bg2:#eceef2; --card:#ffffff; --line:#e1e3ea;
+    --txt:#1a1a22; --mut:#5b5b68; --amb:#b9791d; --amb2:#a16207; --sky:#0369a1; --pro:#b45309;
+    color-scheme:light;
+  }
+  body.light .hero .glow{opacity:.5}
+  body.light pre{background:#0e0e14;color:#d6d6e0}
+  body.light pre .c{color:#8a8a98}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.65 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-family:Sora,sans-serif;line-height:1.15;margin:0}
+  a{color:var(--amb);text-decoration:none}
+  code,pre{font-family:"JetBrains Mono",monospace}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 22px}
+  .mut{color:var(--mut)} .amb{color:var(--amb)}
+  .chip{display:inline-block;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--amb);font-weight:600;font-family:Sora}
+  nav{position:sticky;top:0;z-index:30;backdrop-filter:blur(12px);background:rgba(12,12,16,.78);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;gap:22px;height:60px}
+  nav .brand{display:flex;align-items:center;gap:8px;font-family:Sora;font-weight:800;letter-spacing:-.02em;color:var(--amb)}
+  nav .brand .emoji{font-size:1.25rem}
+  nav .sep{color:var(--mut);opacity:.45}
+  nav .inema{color:var(--sky);font-weight:600;font-size:.88rem;font-family:Sora}
+  nav .inema:hover{filter:brightness(1.15)}
+  nav .pro{color:var(--pro);font-weight:600;font-size:.88rem;font-family:Sora}
+  nav .pro:hover{filter:brightness(1.15)}
+  nav .clubpro{display:inline-flex;align-items:center;gap:6px}
+  nav .links{margin-left:auto;display:flex;align-items:center;gap:20px;font-size:.92rem}
+  nav .links a.sec{color:var(--mut)} nav .links a.sec:hover{color:var(--txt)}
+  .lang{display:inline-flex;gap:2px;font-family:Sora;font-size:.78rem}
+  .lang a{color:var(--mut);padding:.2em .45em;border-radius:6px} .lang a.on{color:var(--amb);background:rgba(226,162,59,.12)}
+  .tgl{background:var(--bg2);border:1px solid var(--line);color:var(--txt);width:38px;height:38px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:1.05rem}
+  .tgl:hover{border-color:var(--amb)}
+  .btn{display:inline-block;background:var(--amb);color:#1a1206;font-weight:600;padding:.6em 1.05em;border-radius:10px;font-family:Sora}
+  .btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line)}
+  nav .links a.sec{white-space:nowrap}
+  @media(max-width:1300px){nav .links{gap:14px;font-size:.86rem}}
+  @media(max-width:1100px){nav .links a.sec[href="#video"],nav .links a.sec[href="#graficos"]{display:none}}
+  @media(max-width:960px){nav .links a.sec[href="#relatorios"]{display:none}}
+  @media(max-width:760px){nav .links a.sec{display:none}}
+  @media(max-width:520px){nav .wrap{gap:8px;padding:8px 14px;height:auto;flex-wrap:wrap} nav .links{gap:8px;margin-left:0;width:100%;justify-content:space-between} nav .btn{padding:.45em .7em;font-size:.82rem} .tgl{width:34px;height:34px}}
+  .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+  .hero .glow{position:absolute;inset:-40% -20% auto auto;width:70%;height:600px;background:radial-gradient(closest-side,rgba(226,162,59,.22),transparent 70%);pointer-events:none}
+  .hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding:74px 22px}
+  .hero h1{font-size:clamp(2.2rem,5vw,3.5rem);font-weight:800;letter-spacing:-.025em}
+  .hero p.lead{font-size:1.18rem;color:var(--mut);margin:1.1em 0 1.6em;max-width:34ch}
+  .hero .cta{display:flex;gap:12px;flex-wrap:wrap}
+  .hero figure{margin:0;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px -30px #000}
+  .hero figure img{width:100%;height:auto;display:block}
+  .resumo{padding:38px 0 34px;border-bottom:1px solid var(--line)}
+  .resumo p{font-size:1.12rem;line-height:1.7;max-width:74ch;margin:.55em 0 0}
+  @media(max-width:780px){.hero .wrap{grid-template-columns:1fr;padding:48px 22px}}
+  section{padding:62px 0;border-bottom:1px solid var(--line)}
+  section h2{font-size:clamp(1.5rem,3.4vw,2.1rem);font-weight:800;letter-spacing:-.02em}
+  section .sub{color:var(--mut);margin:.6em 0 2em;max-width:62ch}
+  .grid{display:grid;gap:16px}
+  .g3{grid-template-columns:repeat(3,1fr)} .g4{grid-template-columns:repeat(4,1fr)} .g2{grid-template-columns:repeat(2,1fr)}
+  @media(max-width:820px){.g3,.g4{grid-template-columns:1fr 1fr}}
+  @media(max-width:540px){.g2,.g3,.g4{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .card h3{font-size:1.05rem;margin-bottom:.4em}
+  .card p{color:var(--mut);font-size:.92rem;margin:0}
+  .num{display:inline-flex;width:30px;height:30px;align-items:center;justify-content:center;border-radius:8px;background:rgba(226,162,59,.14);color:var(--amb);font-family:Sora;font-weight:800;font-size:.9rem;margin-bottom:.7em}
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+  .flow span{background:var(--bg2);border:1px solid var(--line);border-radius:999px;padding:.45em .9em;font-size:.85rem;font-family:Sora;font-weight:600}
+  .flow .arr{color:var(--amb);border:none;background:none;padding:0 .1em}
+  pre{background:#0a0a0e;border:1px solid var(--line);border-radius:12px;padding:16px 18px;overflow:auto;font-size:.86rem;line-height:1.6;color:#d6d6e0}
+  pre .c{color:#6f6f7c} pre .k{color:var(--amb2)} pre .s{color:#9ece6a}
+  .step{display:grid;grid-template-columns:46px minmax(0,1fr);gap:16px;margin-bottom:26px}
+  .step>div,.card{min-width:0}
+  p code,li code,td code{overflow-wrap:anywhere}
+  .step .b{width:46px;height:46px;border-radius:12px;background:var(--amb);color:#1a1206;font-family:Sora;font-weight:800;font-size:1.25rem;display:flex;align-items:center;justify-content:center}
+  .step h3{font-size:1.12rem;margin-bottom:.3em}
+  .step p{color:var(--mut);margin:.2em 0 .7em}
+  .ex{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:680px){.ex{grid-template-columns:1fr}}
+  .ex figure{margin:0;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+  .ex figure img{width:100%;height:auto;display:block}
+  .ex figcaption{padding:12px 14px;font-size:.88rem;color:var(--mut);background:var(--card)}
+  .phase{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)}
+  .phase:last-child{border:none}
+  .phase .tag{flex:0 0 92px;font-family:Sora;font-weight:800;color:var(--amb)}
+  .phase .d strong{display:block;margin-bottom:.2em}
+  .phase .d span{color:var(--mut);font-size:.92rem}
+  footer{padding:46px 0;text-align:center;color:var(--mut);font-size:.9rem}
+  .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:.3em .8em;font-size:.78rem;color:var(--mut);margin:0 4px}
+  table.n{width:100%;border-collapse:collapse;font-size:.92rem;margin-top:10px}
+  table.n th,table.n td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left}
+  table.n th{color:var(--amb);font-family:Sora}
+  /* comparison charts (amber = now/reality, blue = before/scenario, hatching = projection) */
+  :root{--c-now:#BF8224;--c-old:#4D8FE0}
+  body.light{--c-now:#B9791D;--c-old:#2F6FC4}
+  .charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+  @media(max-width:820px){.charts{grid-template-columns:1fr}}
+  .chart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 18px 14px}
+  .chart h3{margin:0 0 4px;font-family:Sora;font-size:1.02rem}
+  .chart .cap{color:var(--mut);font-size:.84rem;margin:0 0 14px}
+  .leg{display:flex;flex-wrap:wrap;gap:14px;font-size:.78rem;color:var(--mut);margin-top:10px}
+  .leg i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+  .sw-now{background:var(--c-now)} .sw-old{background:var(--c-old)}
+  .sw-proj{background:repeating-linear-gradient(45deg,var(--c-now) 0 3px,transparent 3px 7px);border:1px solid var(--c-now)}
+  .hb{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+  .hb .g{font-size:.78rem;color:var(--mut);margin-top:6px}
+  .hb .row{display:grid;grid-template-columns:118px minmax(0,1fr);gap:10px;align-items:center;font-size:.82rem}
+  .hb .row>span:first-child{color:var(--mut);line-height:1.25}
+  .hb .trk{position:relative;height:22px}
+  .bar{height:100%;border-radius:0 4px 4px 0;min-width:4px;display:flex;align-items:center}
+  .bar.now{background:var(--c-now)} .bar.old{background:var(--c-old)}
+  .bar.proj{background:repeating-linear-gradient(45deg,var(--c-now) 0 3px,transparent 3px 7px);border:1px solid var(--c-now)}
+  .bar b{position:absolute;left:calc(var(--w) + 8px);font-weight:600;font-size:.8rem;color:var(--txt);white-space:nowrap}
+  .vb{display:flex;align-items:flex-end;gap:6px;height:190px;border-bottom:1px solid var(--line);padding-top:22px}
+  .vb .col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;position:relative}
+  .vb .col .v{font-size:.74rem;font-weight:600;color:var(--txt);margin-bottom:3px}
+  .vb .col .b{width:100%;max-width:38px;border-radius:4px 4px 0 0;min-height:2px}
+  .vb .col .b.now{background:var(--c-now)} .vb .col .b.old{background:var(--c-old)}
+  .vb .col .b.proj{background:repeating-linear-gradient(45deg,var(--c-now) 0 3px,transparent 3px 7px);border:1px solid var(--c-now);border-bottom:none}
+  .vb .gap{flex:0 0 14px;align-self:center;color:var(--mut);text-align:center}
+  .vx{display:flex;gap:6px;font-size:.72rem;color:var(--mut);margin-top:6px}
+  .vx span{flex:1;text-align:center} .vx .gap{flex:0 0 14px}
+  /* original reports + original charts + adjustment */
+  .reps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-bottom:46px}
+  .rep{display:flex;flex-direction:column;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;color:var(--txt)}
+  .rep:hover{border-color:var(--amb)}
+  .rep .tag{font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--amb);font-family:Sora;font-weight:600}
+  .rep strong{font-family:Sora;font-size:1.25rem}
+  .rep span{color:var(--mut);font-size:.93rem}
+  .rep em{font-style:normal;color:var(--amb);font-weight:600;font-size:.88rem;margin-top:auto}
+  .h3o{font-family:Sora;font-size:1.35rem;margin:0 0 .2em}
+  .origs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+  .orig{margin:0;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+  .orig img{display:block;width:100%;height:auto;background:#fff}
+  .orig figcaption{padding:16px 18px;display:flex;flex-direction:column;gap:8px;font-size:.9rem}
+  .orig figcaption b{font-family:Sora;font-size:1.02rem}
+  .orig figcaption span{color:var(--mut)} .orig figcaption i{font-style:normal;color:var(--amb);font-weight:600}
+  .ajuste{margin-top:52px}
+  .aj{border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .ajrow{display:grid;grid-template-columns:1.5fr 1fr 1fr .9fr;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line);align-items:center;font-size:.92rem}
+  .ajrow:last-child{border-bottom:none}
+  .ajrow small{display:block;color:var(--mut);font-size:.78rem;font-weight:400}
+  .ajhead{background:var(--bg2);font-family:Sora;font-weight:600;color:var(--amb);font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}
+  .ajrow .old{color:var(--c-old);font-weight:600} .ajrow .now{color:var(--c-now);font-weight:700}
+  .ajrow .dif{font-family:Sora;font-weight:800;color:var(--amb)}
+  .aj-em{margin-top:18px;background:rgba(226,162,59,.08);border:1px solid rgba(226,162,59,.35);border-radius:14px;padding:18px 20px}
+  .aj-em small{display:block;color:var(--mut);margin-top:10px;font-size:.82rem}
+  @media(max-width:820px){.reps,.origs{grid-template-columns:1fr}
+    .ajhead{display:none}
+    .ajrow{grid-template-columns:1fr 1fr;gap:8px 14px}
+    .ajrow>span:first-child{grid-column:1/-1}
+    .ajrow .dif{grid-column:1/-1}}
+  /* original scenario with projections on top + explanations */
+  .cen{margin-bottom:52px}
+  .kbox{display:flex;flex-direction:column;gap:7px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--amb);border-radius:12px;padding:16px 18px;margin:0 0 22px;font-size:.9rem}
+  .kbox span{color:var(--mut)} .kbox i:not(.sw){font-style:normal;color:var(--txt);font-weight:600}
+  .kbox .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:7px;vertical-align:-1px}
+  .ov{position:relative;background:#fff}
+  .ov .pa{position:absolute;left:0;right:0;pointer-events:none}
+  .ov .vl{position:absolute;top:0;bottom:0;border-left:3px dashed #16a34a}
+  .ov .vl.old{border-left-color:#2563eb}
+  .ov .band{position:absolute;top:0;bottom:0;background:rgba(226,162,59,.32);border-left:2px solid #d97706;border-right:2px solid #d97706}
+  .ov .band.ted{background:repeating-linear-gradient(45deg,rgba(147,51,234,.22) 0 6px,rgba(147,51,234,.08) 6px 12px);border-color:#9333ea}
+  .ov em,.mk em{font-style:normal;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font:800 .75rem Sora,sans-serif;color:#fff;background:#16a34a}
+  .ov em{position:absolute;top:-4px;left:50%;transform:translateX(-50%);box-shadow:0 1px 4px rgba(0,0,0,.35)}
+  .ov .vl em{left:-1.5px}
+  .ov .vl.old em,.mk em.old{background:#2563eb}
+  .ov .band em,.mk em.band{background:#d97706} .ov .band.ted em,.mk em.ted{background:#9333ea}
+  .mk{list-style:none;margin:2px 0;padding:0;display:flex;flex-direction:column;gap:6px;color:var(--mut)}
+  .mk li{position:relative;padding-left:30px;min-height:22px} .mk li>em{position:absolute;left:0;top:1px}
+  .ov .band em{top:auto;bottom:6px}
+  .exp{color:var(--mut);font-size:.86rem;margin:12px 0 0;padding-top:12px;border-top:1px dashed var(--line)}
+  .exp b{color:var(--amb)}
+  /* action plan + window animation */
+  .anim{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 22px 18px;margin-bottom:34px}
+  .an-top{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin-bottom:26px}
+  .clk{display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--mut)} .clk b{color:var(--amb)}
+  .dial{position:relative;width:42px;height:42px;border-radius:50%;border:3px solid var(--c-old)}
+  .dial.now{border-color:var(--c-now)}
+  .hand{position:absolute;left:50%;bottom:50%;width:3px;height:15px;margin-left:-1.5px;border-radius:2px;background:var(--txt);transform-origin:50% 100%}
+  .anim.run .hand.slow{animation:spin 3s linear infinite} .anim.run .hand.fast{animation:spin 1.765s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .replay{margin-left:auto;background:var(--bg2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.45em .9em;cursor:pointer;font:600 .85rem Sora,sans-serif}
+  .replay:hover{border-color:var(--amb)}
+  .an-axis{position:relative;height:34px;margin:0 8% 6px 150px;border-bottom:1px solid var(--line);font-size:.74rem;color:var(--mut)}
+  .an-axis span{position:absolute;bottom:4px;transform:translateX(-50%);text-align:center;line-height:1.15;white-space:nowrap}
+  .an-axis span:first-child{transform:none}
+  .trk2{display:grid;grid-template-columns:140px minmax(0,1fr);gap:10px;align-items:center;margin:18px 8% 0 0}
+  .trk2 .lbl{font:600 .82rem Sora,sans-serif;color:var(--mut)}
+  .lane{position:relative;height:30px;background:var(--bg2);border-radius:8px;margin-bottom:46px}
+  .fill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:8px}
+  .fill.old{background:var(--c-old)} .fill.now{background:var(--c-now)}
+  .zone{position:absolute;top:-4px;bottom:-4px;background:repeating-linear-gradient(45deg,rgba(226,162,59,.35) 0 5px,transparent 5px 10px);border:1px dashed var(--c-now);border-radius:6px}
+  .pin{position:absolute;top:-6px;bottom:-6px;border-left:3px solid var(--c-old);opacity:.25;transition:opacity .4s}
+  .pin.now{border-color:var(--c-now)} .pin.on{opacity:1}
+  .pin em{position:absolute;top:100%;margin-top:4px;font-style:normal;font-size:.72rem;font-weight:600;white-space:nowrap;transform:translateX(-100%);color:var(--txt)}
+  .pin.now em{transform:none;left:4px}
+  .pin small{position:absolute;bottom:100%;margin-bottom:2px;font-size:.72rem;color:var(--mut);white-space:nowrap;transform:translateX(-50%)}
+  .cnt{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:.8rem;color:#fff;font-weight:600;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+  .cnt b{font:800 1.05rem Sora,sans-serif}
+  .an-cap{color:var(--mut);font-size:.9rem;margin:0}
+  .vs{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .vcol{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+  .vcol.old{border-top:4px solid var(--c-old)} .vcol.now{border-top:4px solid var(--c-now)}
+  .vcol .tag{font:600 .74rem Sora,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+  .vcol h3{font-family:Sora;margin:.4em 0 .7em;font-size:1.1rem}
+  .vcol ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;color:var(--mut);font-size:.9rem}
+  .vcol li b{color:var(--txt)}
+  .steps2{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+  .st{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:6px;font-size:.86rem}
+  .st .when{font:800 .78rem Sora,sans-serif;color:var(--amb);text-transform:uppercase;letter-spacing:.05em}
+  .st b{font-family:Sora;font-size:.98rem} .st>span:last-child{color:var(--mut)}
+  .st code{font-size:.8rem;color:var(--amb2)}
+  @media(max-width:1000px){.steps2{grid-template-columns:1fr 1fr}}
+  @media(max-width:700px){.vs,.steps2{grid-template-columns:1fr}
+    .an-axis{margin-left:0;margin-right:12%} .trk2{grid-template-columns:1fr;gap:24px;margin-right:12%}}
+  /* technical part kept apart at the bottom */
+  .techhead{background:var(--bg2);border-top:3px solid var(--amb);padding:58px 0 8px}
+  .techhead h2{font-family:Sora;margin:.3em 0 0}
+  .techzone{background:var(--bg2)}
+  .caso-cta{display:flex;flex-direction:column;gap:6px;margin-top:26px;background:var(--card);border:1px solid var(--amb);border-radius:16px;padding:20px 22px;color:var(--txt)}
+  .caso-cta:hover{background:var(--bg2)} .caso-cta b{font:800 1.2rem Sora,sans-serif} .caso-cta>span:last-child{color:var(--mut)}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="#top"><span class="emoji">📡</span> Trending radar</a>
+  <span class="sep">|</span>
+  <span class="clubpro">
+    <a class="inema" href="https://inema.club" target="_blank" rel="noopener">INEMA.CLUB</a>
+    <span class="sep">-</span>
+    <a class="pro" href="https://inema.pro" target="_blank" rel="noopener">PRO</a>
+  </span>
+  <div class="links">
+    <a class="sec" href="#painel">The panel</a>
+    <a class="sec" href="#porque">Why did it blow up?</a>
+    <a class="sec" href="#achado">The finding</a>
+    <a class="sec" href="#acao">How to use the idea</a>
+    <a class="sec" href="#tecnico">Kit (technical)</a>
+    <span class="lang"><a href="../">PT</a><a class="on" href="./">EN</a><a href="../es/">ES</a></span>
+    <button class="tgl" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">🌙</button>
+    <a class="btn" href="https://github.com/inematds/youtube-bombando" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</div></nav>
+
+<header class="hero" id="top">
+  <div class="glow"></div>
+  <div class="wrap">
+    <div>
+      <span class="chip">youtube-bombando · free project · runs on your computer · no key</span>
+      <h1><span class="amb">The trending radar:</span> find out every morning what is blowing up on YouTube in your niche, and why</h1>
+      <p class="lead">You record, you put in the effort, and the video goes nowhere. Meanwhile, a small channel on the same topic gets hundreds of times its usual views. <strong>The trending radar</strong> shows you, before you record, what is growing and whether it grew because of the topic (you can use the idea) or just because the channel is big (you can't).</p>
+      <div class="cta">
+        <a class="btn" href="#painel">See the panel in 3 minutes</a>
+        <a class="btn ghost" href="https://github.com/inematds/youtube-bombando" target="_blank" rel="noopener">See it on GitHub</a>
+      </div>
+    </div>
+    <figure><img src="../assets/banner-en.jpg" alt="The trending radar — find out every morning what is blowing up on YouTube in your niche, and why"></figure>
+  </div>
+</header>
+
+<section id="resumo" class="resumo"><div class="wrap">
+  <span class="chip">In short</span>
+  <p><strong>youtube-bombando</strong> is a small system that runs by itself on your computer every morning. It searches YouTube for the week's videos on the topics you choose, records each one's views for 7 days and builds a panel showing what is growing fastest. For each video, it compares the views with the channel's own usual numbers and tells you whether the signal comes from the <strong>content</strong>, from <strong>who posts</strong> (a big channel) or from <strong>who speaks</strong> (a guest). It's for people who make videos or want to start a channel. All it needs is Python and a free tool that reads YouTube; no key, no paid API.</p>
+  <figure style="margin:22px 0 0;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px -30px #000"><img src="../assets/banner-grade-en.jpg" alt="The trending radar: hot topics, hottest per niche, growth chart, why it blew up, burst the bubble, every day at 7:15 AM" loading="lazy" style="width:100%;display:block"></figure>
+</div></section>
+
+<section id="painel"><div class="wrap">
+  <span class="chip">The panel</span>
+  <h2>What you see <span class="amb">every morning</span></h2>
+  <p class="sub">At 7:15 AM the collection finishes and the panel updates by itself. You pick the topic at the top and the order of the videos; each sort option is explained below the selector.</p>
+  <div class="ex">
+    <figure><img src="../assets/painel-topo.png" alt="Top of the panel: topic filter, sort by with explanation, and hot topics" loading="lazy"><figcaption><b>Hot topics.</b> The words that show up most in the titles of the fastest-growing videos. The bar shows the weight (views per hour added up).</figcaption></figure>
+    <figure><img src="../assets/mais-quente.png" alt="Hottest video in each niche, with thumbnail, numbers and chart" loading="lazy"><figcaption><b>The hottest in each topic.</b> Thumbnail, views, age (time since it was published), views per hour, how far it beat the channel's usual numbers, and the growth chart.</figcaption></figure>
+    <figure><img src="../assets/grafico.png" alt="Growth chart of a video: views by hours since publication" loading="lazy"><figcaption><b>Growth chart.</b> Views (vertical) by hours since publication (horizontal). The dashed line goes from publication to the 1st measurement; the solid line connects the daily measurements.</figcaption></figure>
+    <figure><img src="../assets/tabela.png" alt="Table of tracked videos with age, views, views per hour, multiplier and why" loading="lazy"><figcaption><b>All videos.</b> Click “see chart” on any row to open that video's growth.</figcaption></figure>
+  </div>
+  <table class="n" style="margin-top:26px">
+    <tr><th>Sort by</th><th>What it means</th></tr>
+    <tr><td>Score</td><td>The hottest right now: how much faster the video grows than the others on the same topic, plus how far it went beyond the size of the channel.</td></tr>
+    <tr><td>Speed</td><td>Views per hour since publication. Favors new videos.</td></tr>
+    <tr><td>24h gain</td><td>Views gained since the previous day's measurement (shows up from the 2nd day of collection).</td></tr>
+    <tr><td>Multiplier</td><td>Views ÷ subscribers. Above 1× the video reached more people than the channel has subscribers.</td></tr>
+    <tr><td>× channel</td><td>Views ÷ the usual numbers of the channel's own latest videos. 3× or more = burst the channel's bubble.</td></tr>
+    <tr><td>Views</td><td>Total views, regardless of age or channel size.</td></tr>
+    <tr><td>Newest</td><td>The most recently published first.</td></tr>
+  </table>
+</div></section>
+
+<section id="porque"><div class="wrap">
+  <span class="chip">Why did it blow up?</span>
+  <h2>Was it the topic, the channel <span class="amb">or who speaks?</span></h2>
+  <p class="sub">A video with 1 million views on a channel with 5 million subscribers teaches you nothing: the audience was already there. The same million on a channel with 7 thousand subscribers teaches a lot. That's why the panel compares each video with the channel's own usual numbers (the median of its latest videos).</p>
+  <div class="grid g3">
+    <div class="card"><h3>🟨 Content</h3><p>Got <strong>3 times or more</strong> the channel's usual. The topic pulled it. This is the idea worth studying and doing your own way.</p></div>
+    <div class="card"><h3>🏢 Who posts (the channel)</h3><p>A big channel (over 500 thousand subscribers) at its usual pace. The audience already existed; copying the topic won't bring the same result.</p></div>
+    <div class="card"><h3>🎙️ Who speaks (the guest)</h3><p>There's a guest (interview, podcast, talk or a well-known name) and it beat 1.5× the usual. The person pulled it.</p></div>
+  </div>
+  <figure style="margin:24px 0 0;border-radius:14px;overflow:hidden;border:1px solid var(--line)"><img src="../assets/porque-bombou.png" alt="Why did it blow up section: bar splitting the views between content, who speaks, who posts, mixed and no data; Burst the bubble list" loading="lazy" style="width:100%;display:block"></figure>
+  <p class="mut" style="margin-top:12px">It's a signal, not proof of cause: simple math (views ÷ the channel's usual), no AI. When the channel has no baseline yet, the video goes under “No data”, never a guess.</p>
+</div></section>
+
+<section id="achado"><div class="wrap">
+  <span class="chip">The finding from the 1st collection (Nov 12, 2026)</span>
+  <h2>Overall, <span class="amb">content rules</span></h2>
+  <p class="sub">320 videos across 7 topics (artificial intelligence, n8n, claude code, AI agents, vibe coding, making money with AI, chatgpt).</p>
+  <div class="grid g3">
+    <div class="card"><h3>56%</h3><p>of the views came from videos that got <strong>3× or more</strong> their channel's usual.</p></div>
+    <div class="card"><h3>23%</h3><p>of the views came from big channels at their normal pace (who posts). On the “artificial intelligence” topic, 31%.</p></div>
+    <div class="card"><h3>810×</h3><p>the biggest jump of the day: a small channel got 810 times its usual. A 5-hour course on a channel with ~7 thousand subscribers got 513×.</p></div>
+  </div>
+  <p class="mut" style="margin-top:14px">These numbers change every day; the panel shows today's.</p>
+</div></section>
+
+<section id="acao"><div class="wrap">
+  <span class="chip">How to use the idea</span>
+  <h2>From the panel to your <span class="amb">next video</span></h2>
+  <div class="phase"><div class="tag">1</div><div class="d"><strong>Look at “Burst the bubble”</strong><span>These are small and mid-size channels that did far better than usual. Their topic and format are the best models to study.</span></div></div>
+  <div class="phase"><div class="tag">2</div><div class="d"><strong>Check the hot topics in your niche</strong><span>Filter by your topic. Words that appear in several fast-growing titles point to a hot theme this week.</span></div></div>
+  <div class="phase"><div class="tag">3</div><div class="d"><strong>Ignore “who posts”</strong><span>A big channel's video at its normal pace shows the strength of the channel, not of the topic. It's not a reference for you.</span></div></div>
+  <div class="phase"><div class="tag">4</div><div class="d"><strong>Follow the chart for a few days</strong><span>From the 2nd day on you get the 24h gain and the real curve. A topic still climbing on day 3 still has room.</span></div></div>
+  <div class="phase"><div class="tag">5</div><div class="d"><strong>Swap the topics for your niche</strong><span>Recipes, finance, fishing, makeup: just change the list of topics. <a href="#guia">how to use ↓</a></span></div></div>
+</div></section>
+
+<div id="tecnico" class="techhead"><div class="wrap">
+  <span class="chip">Technical part</span>
+  <h2>The kit: <span class="amb">for those who want to run the radar</span></h2>
+  <p class="sub">From here down is the technical part: install it, choose the topics and leave it running every day. You <strong>don't need</strong> this part to understand everything above.</p>
+</div></div>
+
+<div class="techzone">
+<section id="oque"><div class="wrap">
+  <span class="chip">What it is</span>
+  <h2>A daily radar, <span class="amb">no key and no API</span></h2>
+  <div class="grid g3">
+    <div class="card"><h3>🔎 Collection</h3><p>Uses <code>yt-dlp</code> (a free, open tool) to find the week's videos for each topic and read the views, just like a browser would. Pauses between calls and a cap per run.</p></div>
+    <div class="card"><h3>📈 Metrics</h3><p>One snapshot per video per day in a local SQLite database: speed, 24h gain, multiplier, × channel and the score. All explained in the README.</p></div>
+    <div class="card"><h3>🖥️ Panel</h3><p>A single <code>index.html</code> that opens in any browser, served on port 8795. It can also show up inside another panel (INEMA shows it in a “Network trends” card).</p></div>
+  </div>
+</div></section>
+
+<section id="fluxo"><div class="wrap">
+  <span class="chip">How it works</span>
+  <h2>Every day at <span class="amb">7:15 AM</span></h2>
+  <div class="flow">
+    <span>Week's search per topic</span><span class="arr">→</span>
+    <span>Views of each video (1 snapshot/day)</span><span class="arr">→</span>
+    <span>Each channel's usual</span><span class="arr">→</span>
+    <span>Metrics + why it blew up</span><span class="arr">→</span>
+    <span>Panel</span>
+  </div>
+  <p class="sub" style="margin-top:16px">Each video is tracked for 7 days from when it was found. Each channel's baseline (latest 20 videos) is kept for 7 days. The first full collection took about 20 minutes.</p>
+</div></section>
+
+<section id="pre"><div class="wrap">
+  <span class="chip">Requirements</span>
+  <h2>Python 3 and <span class="amb">yt-dlp</span></h2>
+  <p class="sub">No key, no extra Python package. The automatic schedule uses Linux systemd; on Mac and Windows you run the collection by hand (or with the system scheduler).</p>
+  <div class="grid g3">
+    <div class="card"><h3>🐍 Python 3.9+</h3><pre><span class="k">python3 --version</span></pre></div>
+    <div class="card"><h3>📥 yt-dlp</h3><p>Install it and keep it up to date (YouTube changes and yt-dlp keeps up).</p><pre><span class="k">python3 -m pip install -U yt-dlp</span>
+<span class="k">yt-dlp --version</span></pre></div>
+    <div class="card"><h3>📦 The project</h3><p>No git: <a href="https://github.com/inematds/youtube-bombando/archive/refs/heads/main.zip">download the ZIP</a>.</p><pre><span class="k">git clone https://github.com/inematds/youtube-bombando</span>
+<span class="k">cd youtube-bombando</span></pre></div>
+  </div>
+</div></section>
+
+<section id="guia"><div class="wrap">
+  <span class="chip">User guide · step by step</span>
+  <h2>In <span class="amb">15 minutes</span></h2>
+
+  <div class="step"><div class="b">1</div><div>
+    <h3>Test without internet</h3>
+    <p>The tests and a run with sample data, without touching YouTube. The test panel goes to <code>dados/teste/painel/</code>.</p>
+    <pre><span class="k">python3 -m unittest discover -s tests</span>
+<span class="k">python3 bombando/rodada.py --fixtures tests/fixtures</span>
+<span class="c"># open dados/teste/painel/index.html in your browser</span></pre>
+  </div></div>
+
+  <div class="step"><div class="b">2</div><div>
+    <h3>Choose your topics</h3>
+    <p>Edit <code>config.json</code>. Each topic has a name, the search term and whether it's active.</p>
+    <pre>{ <span class="s">"nome"</span>: <span class="s">"easy recipes"</span>, <span class="s">"busca"</span>: <span class="s">"easy recipe"</span>, <span class="s">"ativo"</span>: true }</pre>
+  </div></div>
+
+  <div class="step"><div class="b">3</div><div>
+    <h3>Run the first collection</h3>
+    <p>It can take from a few minutes to half an hour, depending on the number of topics. For a single topic, use <code>--nicho</code>.</p>
+    <pre><span class="k">python3 bombando/rodada.py</span>
+<span class="k">python3 bombando/rodada.py --nicho 'easy recipes'</span></pre>
+  </div></div>
+
+  <div class="step"><div class="b">4</div><div>
+    <h3>Open the panel</h3>
+    <p>The panel is a single file. Open it directly or serve it on port 8795.</p>
+    <pre><span class="k">python3 -m http.server 8795 --directory painel</span>
+<span class="c"># http://localhost:8795</span></pre>
+  </div></div>
+
+  <div class="step"><div class="b">5</div><div>
+    <h3>Leave it running every day (Linux)</h3>
+    <p>Installs the 7:15 AM schedule and the panel server as services for your user. Safe to run again.</p>
+    <pre><span class="k">bash deploy/instalar.sh</span>
+<span class="k">systemctl --user list-timers youtube-bombando.timer</span></pre>
+  </div></div>
+
+  <div class="step"><div class="b">6</div><div>
+    <h3>Just rebuild the panel</h3>
+    <p>Without collecting anything, for example after changing something in the look.</p>
+    <pre><span class="k">python3 bombando/rodada.py --so-painel</span></pre>
+  </div></div>
+</div></section>
+
+<section id="roadmap"><div class="wrap">
+  <span class="chip">Roadmap</span>
+  <h2>Next steps</h2>
+  <div class="phase"><div class="tag">Today · 1.2</div><div class="d"><strong>Radar, why it blew up and growth chart</strong><span>7 topics, daily panel, hottest video with numbers, explained sorting, 33 tests.</span></div></div>
+  <div class="phase"><div class="tag">Next</div><div class="d"><strong>Trend of the week</strong><span>With more days of collection, compare this week's topics with last week's.</span></div></div>
+  <div class="phase"><div class="tag">Later</div><div class="d"><strong>Alert when a video explodes</strong><span>A message when a video in your topic goes past a × channel limit.</span></div></div>
+</div></section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="pill">Python 3</div><div class="pill">yt-dlp</div><div class="pill">SQLite</div><div class="pill">no key</div>
+    <p style="margin-top:18px">The trending radar · youtube-bombando project ·
+      <a href="https://github.com/inematds/youtube-bombando">inematds/youtube-bombando</a> ·
+      <a href="https://inema.club">INEMA.CLUB</a></p>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var KEY='youtube-bombando-theme';
+    var b=document.body, t=document.getElementById('themeToggle');
+    if(localStorage.getItem(KEY)==='light'){ b.classList.add('light'); t.textContent='☀️'; }
+    t.addEventListener('click',function(){
+      var light=b.classList.toggle('light');
+      t.textContent=light?'☀️':'🌙';
+      localStorage.setItem(KEY, light?'light':'dark');
+    });
+  })();
+</script>
+</body>
+</html>
