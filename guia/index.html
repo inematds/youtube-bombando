@@ -381,10 +381,13 @@
     <div class="card"><h3>🐍 Python 3.9+</h3><pre><span class="k">python3 --version</span></pre></div>
     <div class="card"><h3>📥 yt-dlp</h3><p>Instale e mantenha atualizado (o YouTube muda e o yt-dlp acompanha).</p><pre><span class="c"># Ubuntu/Debian recentes</span>
 <span class="k">sudo apt install pipx &amp;&amp; pipx install yt-dlp</span>
+<span class="k">pipx ensurepath</span>
+<span class="c"># depois feche e abra o terminal</span>
 <span class="c"># outros sistemas</span>
 <span class="k">python3 -m pip install -U yt-dlp</span>
 <span class="k">yt-dlp --version</span></pre></div>
-    <div class="card"><h3>📦 O projeto</h3><p>Sem git: <a href="https://github.com/inematds/youtube-bombando/archive/refs/heads/main.zip">baixe o ZIP</a>.</p><pre><span class="k">git clone https://github.com/inematds/youtube-bombando</span>
+    <div class="card"><h3>📦 O projeto</h3><p>Sem git: <a href="https://github.com/inematds/youtube-bombando/archive/refs/heads/main.zip">baixe o ZIP</a>.</p><pre><span class="c"># sem git? sudo apt install git</span>
+<span class="k">git clone https://github.com/inematds/youtube-bombando</span>
 <span class="k">cd youtube-bombando</span>
 <span class="c"># baixou o ZIP? a pasta é youtube-bombando-main</span></pre></div>
   </div>
@@ -430,7 +433,7 @@
 
   <div class="step"><div class="b">5</div><div>
     <h3>Deixe rodando todo dia (Linux)</h3>
-    <p>Instala o horário das 07:15 e o servidor do painel como serviços do seu usuário. Pode repetir sem problema. O computador precisa estar ligado; se estiver desligado às 07:15, a coleta roda assim que ele ligar.</p>
+    <p>Instala o horário das 07:15 e o servidor do painel como serviços do seu usuário. Pode repetir sem problema. O computador precisa estar ligado e com você conectado; se estava desligado às 07:15, a coleta roda assim que você ligar e entrar nele. O painel fica visível para os outros aparelhos da sua rede de casa (porta 8795).</p>
     <pre><span class="k">bash deploy/instalar.sh</span>
 <span class="k">systemctl --user list-timers youtube-bombando.timer</span></pre>
   </div></div>

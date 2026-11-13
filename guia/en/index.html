@@ -381,10 +381,13 @@
     <div class="card"><h3>🐍 Python 3.9+</h3><pre><span class="k">python3 --version</span></pre></div>
     <div class="card"><h3>📥 yt-dlp</h3><p>Install it and keep it up to date (YouTube changes and yt-dlp keeps up).</p><pre><span class="c"># recent Ubuntu/Debian</span>
 <span class="k">sudo apt install pipx &amp;&amp; pipx install yt-dlp</span>
+<span class="k">pipx ensurepath</span>
+<span class="c"># then close and reopen the terminal</span>
 <span class="c"># other systems</span>
 <span class="k">python3 -m pip install -U yt-dlp</span>
 <span class="k">yt-dlp --version</span></pre></div>
-    <div class="card"><h3>📦 The project</h3><p>No git: <a href="https://github.com/inematds/youtube-bombando/archive/refs/heads/main.zip">download the ZIP</a>.</p><pre><span class="k">git clone https://github.com/inematds/youtube-bombando</span>
+    <div class="card"><h3>📦 The project</h3><p>No git: <a href="https://github.com/inematds/youtube-bombando/archive/refs/heads/main.zip">download the ZIP</a>.</p><pre><span class="c"># no git? sudo apt install git</span>
+<span class="k">git clone https://github.com/inematds/youtube-bombando</span>
 <span class="k">cd youtube-bombando</span>
 <span class="c"># downloaded the ZIP? the folder is youtube-bombando-main</span></pre></div>
   </div>
@@ -430,7 +433,7 @@
 
   <div class="step"><div class="b">5</div><div>
     <h3>Leave it running every day (Linux)</h3>
-    <p>Installs the 7:15 AM schedule and the panel server as services for your user. Safe to run again. The computer must be on; if it is off at 7:15, the collection runs as soon as it starts.</p>
+    <p>Installs the 7:15 AM schedule and the panel server as services for your user. Safe to run again. The computer must be on and you logged in; if it was off at 7:15, the collection runs as soon as you turn it on and log in. The panel is visible to other devices on your home network (port 8795).</p>
     <pre><span class="k">bash deploy/instalar.sh</span>
 <span class="k">systemctl --user list-timers youtube-bombando.timer</span></pre>
   </div></div>
