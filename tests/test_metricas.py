@@ -1,7 +1,7 @@
 import math
 import unittest
 from datetime import datetime, timezone
-from bombando.metricas import calcular, assuntos
+from bombando.metricas import bonus_relevancia, calcular, assuntos, furaram_bolha, velocidade_recente
 from bombando.painel import sparkline, crescimento, pontos_crescimento, idade_txt, curto, ORDENS
 
 
@@ -32,6 +32,32 @@ class MetricasTest(unittest.TestCase):
     def test_reducao_views_preservada(self):
         fotos = [dict(dia='2026-11-11', views=200), dict(dia='2026-11-12', views=100)]
         self.assertEqual(calcular(None, fotos, self.agora)['ganho_24h'], -100)
+
+    def test_ritmo_recente_usa_medicoes_e_limita_janela(self):
+        fotos = [dict(dia='2026-11-04', views=1000), dict(dia='2026-11-08', views=2400),
+                 dict(dia='2026-11-10', views=None), dict(dia='2026-11-11', views=9600)]
+        self.assertEqual(velocidade_recente(fotos, self.agora.date()), 100)
+        self.assertIsNone(velocidade_recente(fotos[2:], self.agora.date()))
+        self.assertIsNone(velocidade_recente(fotos, datetime(2026, 11, 13).date()))
+        self.assertIsNone(velocidade_recente([fotos[0], fotos[-1]], self.agora.date()))
+
+    def test_bonus_privilegia_ritmo_retomada_e_idade_com_procura(self):
+        novo = dict(velocidade_recente=400, velocidade=400, idade_h=24)
+        antigo = dict(novo, idade_h=720)
+        retomada = dict(antigo, velocidade=50)
+        parado = dict(antigo, velocidade_recente=0)
+        self.assertGreater(bonus_relevancia(retomada), bonus_relevancia(antigo))
+        self.assertGreater(bonus_relevancia(antigo), bonus_relevancia(novo))
+        self.assertEqual(bonus_relevancia(parado), 0)
+
+    def test_bolha_corte_estrito_e_limite(self):
+        videos = [dict(id=str(i), views=50_001, fator_canal=i+3, porte='pequeno',
+                       indisponivel=False) for i in range(12)]
+        videos[11]['views'] = 50_000
+        videos[10]['indisponivel'] = True
+        videos.append(dict(videos[0], id='grande', porte='grande', fator_canal=90))
+        self.assertEqual([v['id'] for v in furaram_bolha(videos, 50_000, 10)],
+                         [str(i) for i in reversed(range(10))])
 
     def test_assuntos_peso_stopwords_e_bigramas(self):
         videos = [dict(titulo='The agentes inteligentes e IA', nota=2, velocidade=100),
@@ -67,4 +93,5 @@ class MetricasTest(unittest.TestCase):
         self.assertEqual(idade_txt(None), '—')
         self.assertEqual(curto(1_234_567), '1,2 mi')
         self.assertEqual(curto(34_000), '34 mil')
-        self.assertEqual(set(ORDENS), {'nota', 'velocidade', 'ganho_24h', 'multiplicador', 'fator_canal', 'views', 'novos'})
+        self.assertEqual(set(ORDENS), {'nota', 'titulo', 'idade_h', 'velocidade_recente', 'velocidade',
+                                     'ganho_24h', 'multiplicador', 'fator_canal', 'views', 'novos'})

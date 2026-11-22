@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.1 — 2026-11-22
+
+- Destaques com até 10 vídeos que furaram a bolha e os três mais quentes por nicho.
+- Tabela por Nota, com corte inicial acima de 50 mil views, filtro por nota mínima e cabeçalhos ordenáveis.
+- A nota do painel incorpora views/h recentes, retomada do crescimento e idade com procura atual.
+
 ## 1.2.1 — 2026-11-12
 
 - Unit da coleta com `Environment=PATH=%h/.local/bin:…`: yt-dlp instalado por pipx/pip --user fica fora do PATH padrão do systemd (achado do revisor do guia).

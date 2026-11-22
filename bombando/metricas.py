@@ -56,6 +56,33 @@ def calcular(publicado, fotos, agora):
                 multiplicador=views / inscritos if views is not None and inscritos else None)
 
 
+def velocidade_recente(fotos, hoje):
+    """Views/h entre fotos reais, numa janela de até três dias."""
+    medidas = [(date.fromisoformat(f['dia']), f['views']) for f in fotos
+               if numero(f.get('views')) is not None]
+    medidas.sort()
+    if len(medidas) < 2:
+        return None
+    fim, views = medidas[-1]
+    if not 0 <= (hoje - fim).days <= 1:
+        return None
+    for inicio, antes in medidas[:-1]:
+        dias = (fim - inicio).days
+        if 0 < dias <= 3:
+            return (views - antes) / (dias * 24)
+    return None
+
+
+def bonus_relevancia(video):
+    ritmo = max(0, video['velocidade_recente'] or 0)
+    media = video['velocidade'] or 0
+    idade_dias = (video['idade_h'] or 0) / 24
+    volume = math.log1p(ritmo / 100)
+    retomada = math.log1p(max(0, ritmo - media) / max(100, media))
+    permanencia = min(1, ritmo / 100) * min(1, idade_dias / 30)
+    return volume + retomada + permanencia
+
+
 def assuntos(videos):
     pesos, vistos = defaultdict(float), defaultdict(int)
     for video in sorted(videos, key=lambda v: v['nota'], reverse=True)[:30]:
@@ -168,8 +195,12 @@ def resumir(videos, nicho='geral'):
         conclusao = f'{prefixo}, {formatar(pesos["Quem fala"])}% das views têm sinal de convidado e superam o normal: o sinal de QUEM FALA predomina.'
     else:
         conclusao = f'{prefixo}, as views se distribuem entre sinais mistos, sem predominância clara.'
-    bolha = sorted((v for v in videos if v['fator_canal'] is not None
-                    and v['fator_canal'] >= FATOR_CONTEUDO and v['porte'] in ('pequeno', 'médio')),
-                   key=lambda v: (-v['fator_canal'], v['id']))[:5]
+    bolha = furaram_bolha(videos, minimo_views=0, limite=5)
     return dict(categorias=categorias, total_videos=len(videos), total_views=total_views,
                 conclusao=conclusao, furaram_bolha=[v['id'] for v in bolha])
+
+
+def furaram_bolha(videos, minimo_views, limite):
+    candidatos = (v for v in videos if not v['indisponivel'] and (v['views'] or 0) > minimo_views
+                  and (v['fator_canal'] or 0) >= FATOR_CONTEUDO and v['porte'] in ('pequeno', 'médio'))
+    return sorted(candidatos, key=lambda v: (-v['fator_canal'], v['id']))[:limite]
