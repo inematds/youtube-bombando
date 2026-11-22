@@ -48,7 +48,7 @@ class RodadaTest(unittest.TestCase):
     def test_rodada_inteira_indisponivel_e_idempotencia(self):
         codigo, saida = self.rodar()
         self.assertEqual(codigo, 0, saida)
-        self.assertIn('rodada ok: 7 nichos, 3 novos, 2 fotos, 1 erros', saida)
+        self.assertIn('rodada ok: 17 nichos, 3 novos, 2 fotos, 1 erros', saida)
         pagina = (self.raiz / 'painel/index.html').read_text()
         self.assertIn('Agentes de IA automatizam tarefas', pagina)
         self.assertIn('<svg', pagina)
@@ -62,6 +62,8 @@ class RodadaTest(unittest.TestCase):
         self.assertIn('class="cresc-g"', estatico)
         self.assertIn('O que cada opção de ordenação quer dizer', estatico)
         dados = self.dados()
+        nichos_configurados = json.loads((self.raiz / 'config.json').read_text())['nichos']
+        self.assertEqual(dados['nichos'], sorted(n['nome'] for n in nichos_configurados if n['ativo']))
         self.assertEqual(sum(v['indisponivel'] for v in dados['videos']), 1)
         self.assertEqual(len(dados['videos'][0]['nichos']), 7)
         self.assertEqual(len(list((self.raiz / 'painel/historico').glob('*.html'))), 1)
@@ -75,7 +77,7 @@ class RodadaTest(unittest.TestCase):
     def test_falha_parcial_e_falha_total(self):
         self.alterar_fixture('buscas.json', lambda d: d.update({'chatgpt': {'erro': 'timeout'}}))
         self.assertEqual(self.rodar()[0], 0)
-        self.assertEqual(self.dados()['rodada']['nichos'], 6)
+        self.assertEqual(self.dados()['rodada']['nichos'], 16)
         self.alterar_fixture('buscas.json', lambda d: d.update({k: {'erro': 'timeout'} for k in d}))
         self.assertEqual(self.rodar()[0], 1)
         self.assertEqual(self.dados()['rodada']['nichos'], 0)

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.1 — 2026-11-22
+
+- Radar diário passa a buscar 17 nichos, incluindo dez novos temas de IA aplicada.
+
 ## 1.3.1 — 2026-11-22
 
 - Destaques com até 10 vídeos que furaram a bolha e os três mais quentes por nicho.

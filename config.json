@@ -34,6 +34,56 @@
       "nome": "chatgpt",
       "busca": "chatgpt",
       "ativo": true
+    },
+    {
+      "nome": "vídeo com ia",
+      "busca": "como criar vídeos com inteligência artificial Kling Veo Seedance",
+      "ativo": true
+    },
+    {
+      "nome": "ia no próprio pc",
+      "busca": "IA local rodar modelos offline Ollama",
+      "ativo": true
+    },
+    {
+      "nome": "robôs humanoides",
+      "busca": "robôs humanoides inteligência artificial demonstração",
+      "ativo": true
+    },
+    {
+      "nome": "estudar com ia",
+      "busca": "estudar com IA NotebookLM Gemini Notebook",
+      "ativo": true
+    },
+    {
+      "nome": "atendimento por voz com ia",
+      "busca": "atendente de voz com IA para empresas",
+      "ativo": true
+    },
+    {
+      "nome": "imagens e design com ia",
+      "busca": "criar imagens e design com inteligência artificial",
+      "ativo": true
+    },
+    {
+      "nome": "planilhas e relatórios com ia",
+      "busca": "análise de dados em planilhas com IA Excel Google Sheets",
+      "ativo": true
+    },
+    {
+      "nome": "música com ia",
+      "busca": "criar música com IA Suno Lyria",
+      "ativo": true
+    },
+    {
+      "nome": "como aparecer nas buscas com ia",
+      "busca": "SEO para busca com IA Google AI Mode GEO",
+      "ativo": true
+    },
+    {
+      "nome": "golpes e deepfakes",
+      "busca": "golpes com inteligência artificial deepfake voz clonada proteção",
+      "ativo": true
     }
   ],
   "por_nicho_busca": 40,
