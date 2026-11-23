@@ -51,21 +51,20 @@ class RodadaTest(unittest.TestCase):
         self.assertIn('rodada ok: 17 nichos, 3 novos, 2 fotos, 1 erros', saida)
         pagina = (self.raiz / 'painel/index.html').read_text()
         self.assertIn('Agentes de IA automatizam tarefas', pagina)
-        self.assertIn('<svg', pagina)
         self.assertIn('Vídeo privado de demonstração', pagina)
         self.assertNotIn('<script src=', pagina)
-        # 1.2: o vídeo mais quente de cada nicho mostra a thumb; só do i.ytimg.com.
-        import re
         estatico = pagina.split('<script id="dados"')[0]
-        self.assertTrue(all('i.ytimg.com/vi/' in t for t in re.findall(r'<img [^>]*>', estatico)))
-        self.assertIn('class="numeros"', estatico)
-        self.assertIn('class="cresc-g"', estatico)
+        self.assertIn('id="marcacoes"', estatico)
+        self.assertIn('data-quentes="chatgpt"', estatico)
         self.assertIn('O que cada opção de ordenação quer dizer', estatico)
         dados = self.dados()
         nichos_configurados = json.loads((self.raiz / 'config.json').read_text())['nichos']
         self.assertEqual(dados['nichos'], sorted(n['nome'] for n in nichos_configurados if n['ativo']))
         self.assertEqual(sum(v['indisponivel'] for v in dados['videos']), 1)
         self.assertEqual(len(dados['videos'][0]['nichos']), 7)
+        self.assertEqual(dados['destaques']['bolha'], [])
+        self.assertEqual(set(dados['destaques']['quentes']['chatgpt']), {'iaDemo00001', 'n8nDemo0001'})
+        self.assertIn('class="cresc-g"', dados['videos'][0]['grafico'])
         self.assertEqual(len(list((self.raiz / 'painel/historico').glob('*.html'))), 1)
         embutido = pagina.split('<script id="dados" type="application/json">')[1].split('</script>')[0]
         self.assertEqual(json.loads(embutido), dados)

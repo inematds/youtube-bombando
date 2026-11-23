@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.1 — 2026-11-23
+
+- Marque vídeos como feitos ou oculte-os dos destaques. As vagas passam aos próximos do ranking, e as marcações podem ser desfeitas no navegador.
+
 ## 1.4.1 — 2026-11-22
 
 - Radar diário passa a buscar 17 nichos, incluindo dez novos temas de IA aplicada.

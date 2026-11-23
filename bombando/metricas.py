@@ -200,7 +200,7 @@ def resumir(videos, nicho='geral'):
                 conclusao=conclusao, furaram_bolha=[v['id'] for v in bolha])
 
 
-def furaram_bolha(videos, minimo_views, limite):
+def furaram_bolha(videos, minimo_views, limite=None):
     candidatos = (v for v in videos if not v['indisponivel'] and (v['views'] or 0) > minimo_views
                   and (v['fator_canal'] or 0) >= FATOR_CONTEUDO and v['porte'] in ('pequeno', 'médio'))
     return sorted(candidatos, key=lambda v: (-v['fator_canal'], v['id']))[:limite]
