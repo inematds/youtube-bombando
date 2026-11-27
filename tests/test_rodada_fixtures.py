@@ -151,7 +151,55 @@ class RodadaTest(unittest.TestCase):
         self.assertEqual([v['id'] for v in candidatos(db, config, agora)], ['iaDemo00001'])
 
 
+    def test_ultimas_24h_busca_prioridade_e_secao(self):
+        agora = datetime.now(timezone.utc)
+        def novo(buscas):
+            buscas['chatgpt'] = {'entries': [
+                {'id': 'hojeRapido1', 'title': 'Lançado hoje e voando', 'channel': 'Canal Novo',
+                 'channel_id': 'UCnovo1', 'view_count': 9000},
+                {'id': 'hojeLento01', 'title': 'Lançado hoje devagar', 'channel': 'Canal Novo',
+                 'channel_id': 'UCnovo1', 'view_count': 500}]}
+        self.alterar_fixture('buscas24h.json', novo)
+        def detalhes(d):
+            d['hojeRapido1'] = {'timestamp': int((agora - timedelta(hours=3)).timestamp()),
+                                'view_count': 9000, 'channel_follower_count': 1000}
+            d['hojeLento01'] = {'timestamp': int((agora - timedelta(hours=10)).timestamp()),
+                                'view_count': 500, 'channel_follower_count': 1000}
+        self.alterar_fixture('detalhes.json', detalhes)
+        self.alterar_fixture('canais.json', lambda c: c.setdefault('UCnovo1', {'entries': []}))
+        codigo, saida = self.rodar()
+        self.assertEqual(codigo, 0, saida)
+        self.assertIn('5 novos, 4 fotos', saida)
+        dados = self.dados()
+        self.assertEqual(dados['destaques']['recentes']['chatgpt'], ['hojeRapido1', 'hojeLento01'])
+        self.assertNotIn('iaDemo00001', dados['destaques']['recentes']['claude code'])  # publicado há dias
+        porid = {v['id']: v for v in dados['videos']}
+        self.assertAlmostEqual(porid['hojeRapido1']['ritmo_24h'], 3000, delta=5)
+        pagina = (self.raiz / 'painel/index.html').read_text()
+        self.assertIn('Bombando nas últimas 24 h', pagina)
+        self.assertIn('data-recentes="chatgpt"', pagina)
+        self.assertNotIn('data-recentes="n8n', pagina)  # nicho sem vídeo de 24 h não ganha bloco
+        # Achado hoje e ainda sem data: passa na frente da fila de detalhe.
+        db = abrir(self.raiz / 'dados/bombando.db')
+        self.addCleanup(db.close)
+        with db:
+            db.execute('DELETE FROM fotos')
+            db.execute('UPDATE videos SET publicado=NULL WHERE id=?', ('hojeLento01',))
+        config = json.loads((self.raiz / 'config.json').read_text())
+        config['max_detalhes_por_rodada'] = 2
+        self.assertEqual([v['id'] for v in candidatos(db, config, agora)], ['hojeRapido1', 'hojeLento01'])
+
+
 class FonteTest(unittest.TestCase):
+    def test_busca_24h_usa_filtro_hoje_por_views(self):
+        config = json.loads((RAIZ / 'config.json').read_text())
+        retorno = subprocess.CompletedProcess([], 0, '{"entries": []}', '')
+        with patch('subprocess.run', return_value=retorno) as run:
+            Fonte(config).obter('buscas24h', 'claude code')
+        comando = run.call_args.args[0]
+        self.assertTrue(comando[-1].endswith('&sp=CAMSAggC'))
+        self.assertEqual(comando[comando.index('--playlist-end') + 1], str(config['por_nicho_24h']))
+
     def setUp(self):
         self.config = json.loads((RAIZ / 'config.json').read_text())
 

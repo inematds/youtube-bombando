@@ -6,6 +6,13 @@ import time
 from urllib.parse import quote_plus
 
 
+# Filtro "sp" da busca do YouTube e o limite de resultados de cada tipo.
+# EgIIAw== = enviados nesta semana (relevância); CAMSAggC = enviados hoje, ordem por views
+# (testado em 27/11/2026: devolve views na própria busca e vídeos com menos de 24 h).
+FILTROS = {'buscas': ('EgIIAw%253D%253D', 'por_nicho_busca'),
+           'buscas24h': ('CAMSAggC', 'por_nicho_24h')}
+
+
 class Indisponivel(RuntimeError):
     pass
 
@@ -31,11 +38,10 @@ class Fonte:
                    '--retries', '1', '--extractor-retries', '1',
                    # Sem youtube:lang=pt: com ele o yt-dlp lê "3,4 mil" como 34 e perde os inscritos.
                    '--geo-bypass-country', self.config['regiao']]
-        if tipo == 'buscas':
-            url = ('https://www.youtube.com/results?search_query=' + quote_plus(chave)
-                   + '&sp=EgIIAw%253D%253D')
-            comando += ['--flat-playlist', '-J', '--playlist-end',
-                        str(self.config['por_nicho_busca']), url]
+        if tipo in FILTROS:
+            filtro, limite = FILTROS[tipo]
+            url = 'https://www.youtube.com/results?search_query=' + quote_plus(chave) + '&sp=' + filtro
+            comando += ['--flat-playlist', '-J', '--playlist-end', str(self.config[limite]), url]
         elif tipo == 'canais':
             comando += ['--flat-playlist', '-J', '--playlist-end', '20',
                         'https://www.youtube.com/channel/' + chave + '/videos']

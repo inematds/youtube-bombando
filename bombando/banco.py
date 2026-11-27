@@ -36,5 +36,8 @@ def abrir(caminho):
     colunas = {r[1] for r in db.execute('PRAGMA table_info(videos)')}
     if 'descricao' not in colunas:
         db.execute('ALTER TABLE videos ADD COLUMN descricao TEXT')
+    if 'achado_24h' not in colunas:
+        # Último instante em que a busca "enviados hoje" devolveu o vídeo.
+        db.execute('ALTER TABLE videos ADD COLUMN achado_24h TEXT')
     db.commit()
     return db

@@ -10,13 +10,18 @@ def candidatos(db, config, agora, nicho=None):
         AND NOT EXISTS (SELECT 1 FROM fotos WHERE fotos.id=videos.id AND dia=?)
         AND (? IS NULL OR EXISTS (SELECT 1 FROM video_nichos WHERE video_id=videos.id AND nicho=?))''',
         (limite, agora.date().isoformat(), nicho, nicho)).fetchall()
+    recente = (agora - timedelta(hours=24)).isoformat()
+
     def prioridade(video):
+        # Achado pela busca "enviados hoje": passa na frente, ou não teria data nem views a tempo.
+        if (video['achado_24h'] or '') >= recente and (video['publicado'] or '9') >= recente:
+            return (0, -(video['views_busca'] or 0), video['descoberto'], video['id'])
         fotos = [dict(r) for r in db.execute('SELECT * FROM fotos WHERE id=? ORDER BY dia', (video['id'],))]
         instante = agora
         if fotos:
             instante = datetime.fromisoformat(fotos[-1]['dia']).replace(tzinfo=timezone.utc) + timedelta(hours=12)
         velocidade = calcular(video['publicado'], fotos, instante)['velocidade']
-        return (-(velocidade or 0), video['descoberto'], video['id'])
+        return (1, -(velocidade or 0), video['descoberto'], video['id'])
     return sorted(linhas, key=prioridade)[:config['max_detalhes_por_rodada']]
 
 

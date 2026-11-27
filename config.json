@@ -87,6 +87,7 @@
     }
   ],
   "por_nicho_busca": 40,
+  "por_nicho_24h": 15,
   "dias_acompanhar": 7,
   "max_detalhes_por_rodada": 250,
   "pausa_s": 1.5,

@@ -58,6 +58,7 @@ Edita `config.json`. Cada elemento de `nichos` contiene `nome`, `busca` y `ativo
 | Campo | Predeterminado | Función |
 |---|---:|---|
 | `por_nicho_busca` | 40 | Máximo de resultados por búsqueda semanal |
+| `por_nicho_24h` | 15 | Máximo de resultados de la búsqueda “subidos hoy”, ordenada por vistas |
 | `dias_acompanhar` | 7 | Ventana desde el primer descubrimiento |
 | `max_detalhes_por_rodada` | 250 | Tope de consultas de detalles |
 | `max_canais_por_rodada` | 120 (este repo usa 200) | Tope de intentos de consulta de canales por ronda |
@@ -175,7 +176,7 @@ Las fixtures están en `tests/fixtures/buscas.json` (mapa por término de búsqu
 2. **⚙️ script/timer — verificar sin red.** Comando: `python3 -m unittest discover -s tests -v`. Prueba métricas, persistencia, fallas y panel en directorios temporales.
 3. **⚙️ script/timer — demostrar la ronda.** Comando: `python3 bombando/rodada.py --fixtures tests/fixtures`. Descubre ejemplos, graba fotos, consulta fixtures de los canales, calcula métricas y genera HTML en `dados/teste/painel/`.
 4. **🧠 sesión con Nei — revisar el resultado.** Comando: `xdg-open dados/teste/painel/index.html`. Comparar nichos, notas, historial, temas y “¿Por qué explotó?”.
-5. **⚙️ script/timer — consultar los videos reales.** Comando: `python3 bombando/rodada.py`. Ejecuta descubrimiento semanal → seguimiento diario → línea de base de los canales → métricas → panel, con lock y logs.
+5. **⚙️ script/timer — consultar los videos reales.** Comando: `python3 bombando/rodada.py`. Ejecuta descubrimiento semanal y de hoy (24 h) → seguimiento diario → línea de base de los canales → métricas → panel, con lock y logs.
 6. **⚙️ script — completar canales de videos seguidos.** Comando: `python3 bombando/rodada.py --so-canais`. Respeta caché, tope, ventana y filtro sin descubrimiento ni fotos. Para probar sin conexión, añadir `--fixtures tests/fixtures`.
 7. **🧠 sesión con Nei — activar la rutina cuando quieras.** Comando: `bash deploy/instalar.sh`. Instala la programación y el servidor.
 8. **⚙️ script/timer — repetir a diario.** Comando ejecutado por la unit: `python3 bombando/rodada.py`. A las 07:15, actualiza las fotos dentro de la ventana y la copia diaria.

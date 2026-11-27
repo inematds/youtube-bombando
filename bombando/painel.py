@@ -4,7 +4,7 @@ from datetime import date, datetime, timedelta, timezone
 import json
 import math
 
-from .metricas import bonus_relevancia, furaram_bolha, velocidade_recente
+from .metricas import bonus_relevancia, furaram_bolha, ultimas_24h, velocidade_recente
 
 MIN_VIEWS = 50_000
 
@@ -184,6 +184,12 @@ function destaqueQuente(v, grupo){
  ${acoesVideo(v.id)}<dl class="numeros">${numeros.map(([rotulo,valor])=>`<div><dt>${rotulo}</dt><dd>${esc(valor)}</dd></div>`).join('')}</dl>
  ${v.grafico}<p class="legenda-g">Tracejado até a 1ª medição · linha cheia para medições diárias</p></article>`;
 }
+function destaqueRecente(v){
+ const numeros=[['Views',curto(v.views??v.views_busca)],['Idade',idade(v.idade_h)],['Views/h',curto(v.ritmo_24h)],
+  ['× canal',vezes(v.fator_canal)],['Views ÷ inscritos',vezes(v.multiplicador)],['Por quê',v.categoria||'—']];
+ return `<article>${miniatura(v)}${linkVideo(v)}<br><small>${esc(v.canal||'Canal não informado')}</small>
+ ${acoesVideo(v.id)}<dl class="numeros">${numeros.map(([rotulo,valor])=>`<div><dt>${rotulo}</dt><dd>${esc(valor)}</dd></div>`).join('')}</dl></article>`;
+}
 function vagas(ids, limite){
  return ids.filter(id=>!marcas.has(id)).slice(0,limite).map(id=>porId.get(id));
 }
@@ -198,6 +204,10 @@ function renderDestaques(){
   const ids=data.destaques.quentes[grupo];
   painel.innerHTML=vagas(ids,3).map(v=>destaqueQuente(v,grupo)).join('')
     ||(ids.length?'<p class="muted">Todos os vídeos elegíveis estão marcados.</p>':'<p class="muted">Aguardando medições.</p>');
+ }
+ for(const painel of document.querySelectorAll('[data-recentes]')){
+  const ids=data.destaques.recentes[painel.dataset.recentes];
+  painel.innerHTML=vagas(ids,3).map(destaqueRecente).join('')||'<p class="muted">Todos os vídeos elegíveis estão marcados.</p>';
  }
  const lista=[...marcas.keys()].map(id=>`<li>${linkVideo(porId.get(id)||{id,titulo:id})}${acoesVideo(id)}</li>`);
  document.getElementById('total-marcacoes').textContent=marcas.size;
@@ -217,7 +227,7 @@ function marcar(botao){
  const id=acoes.dataset.marcaId;
  const estado=botao.dataset.marca;
  const item=botao.closest('li, article');
- const grupo=botao.closest('#bolha, [data-quentes], #marcacoes');
+ const grupo=botao.closest('#bolha, [data-quentes], [data-recentes], #marcacoes');
  const pos=item&&grupo?[...item.parentElement.children].indexOf(item):0;
  try {
   if(estado==='restaurar')localStorage.removeItem(prefixoMarca+id);
@@ -347,7 +357,13 @@ def gerar(dados, pasta, agora):
         grupo = [v for v in dados['videos'] if nicho in v['notas_painel'] and v['views'] is not None]
         ordenados = sorted(grupo, key=lambda v: (-v['notas_painel'][nicho], v['id']))
         quentes[nicho] = [v['id'] for v in ordenados]
-    dados['destaques'] = dict(bolha=[v['id'] for v in bolha], quentes=quentes)
+    recentes = {}
+    for video in dados['videos']:
+        video.update(ultimas_24h(video, agora) or dict(ritmo_24h=None, nota_24h=None))
+    for nicho in dados['nichos']:
+        grupo = [v for v in dados['videos'] if nicho in v['nichos'] and v['nota_24h'] is not None]
+        recentes[nicho] = [v['id'] for v in sorted(grupo, key=lambda v: (-v['nota_24h'], v['id']))]
+    dados['destaques'] = dict(bolha=[v['id'] for v in bolha], quentes=quentes, recentes=recentes)
     serializado = json.dumps(dados, ensure_ascii=False, allow_nan=False)
     seguro = serializado.replace('&', '\\u0026').replace('<', '\\u003c').replace('>', '\\u003e')
     chips = '<button data-nicho="" aria-pressed="true">Todos</button>' + ''.join(
@@ -356,6 +372,10 @@ def gerar(dados, pasta, agora):
         f'<section class="hot-nicho"><h3>{html.escape(n)}</h3>'
         f'<div class="hot" data-quentes="{html.escape(n, quote=True)}" tabindex="-1"></div></section>'
         for n in quentes)
+    grupos_recentes = ''.join(
+        f'<section class="hot-nicho"><h3>{html.escape(n)}</h3>'
+        f'<div class="hot" data-recentes="{html.escape(n, quote=True)}" tabindex="-1"></div></section>'
+        for n, ids in recentes.items() if ids)
     opcoes = ''.join(f'<option value="{chave}">{html.escape(rotulo)}</option>'
                      for chave, (rotulo, _) in ORDENS.items())
     colunas = ''.join(cabecalho_ordenavel(chave, rotulo) for chave, rotulo in (
@@ -367,10 +387,11 @@ def gerar(dados, pasta, agora):
     erro_html = '<details><summary>Ocorrências da rodada</summary><ul>' + ''.join(f'<li>{html.escape(e)}</li>' for e in erros) + '</ul></details>' if erros else ''
     pagina = f'''<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>YouTube bombando</title><style>{CSS}</style></head>
 <body><main><header><h1>YouTube bombando</h1><p class="muted">Descubra os assuntos que ganham força nos seus nichos.</p><p>Última rodada: {html.escape(data_local(rodada.get('instante')))} · {len(dados['videos'])} vídeos acompanhados · <span class="status">{status}</span>{' · Dados de exemplo (fixtures)' if rodada.get('fixtures') else ''}</p>{erro_html}</header>
+<section aria-labelledby="ultimas24"><h2 id="ultimas24">Bombando nas últimas 24 h</h2><p class="muted">Vídeos publicados há menos de 24 horas, achados pela busca “enviados hoje” de cada nicho, que vem ordenada por views. A ordem aqui segue as views por hora desde a publicação, com peso para views acima dos inscritos. Ainda não há histórico, então este é um sinal de largada, não de tendência.</p>{grupos_recentes or '<p class="muted">Nenhum vídeo das últimas 24 h com views medidas nesta rodada.</p>'}</section>
 <section aria-labelledby="furaram"><h2 id="furaram">10 vídeos que furaram a bolha</h2><p class="muted">Canais pequenos e médios com mais de 50 mil views e pelo menos 3× a mediana de views do próprio canal.</p>
 <details id="marcacoes" class="marcacoes"><summary>Minhas marcações (<span id="total-marcacoes">0</span>)</summary><p class="muted">As marcações valem para todos os nichos neste navegador.</p><p id="marcacoes-vazio" class="muted">Nenhum vídeo marcado.</p><ul id="lista-marcacoes"></ul></details>
 <p id="aviso-marcacao" class="aviso-marcacao" role="status"></p><p id="erro-marcacao" class="erro-marcacao" role="alert" hidden>O navegador bloqueou o armazenamento. As marcações valem até fechar ou recarregar a página.</p>
-<p><a href="#videos">Ver todos os vídeos</a> · <a href="#quentes">Ver os mais quentes por nicho</a></p>
+<p><a href="#ultimas24">Ver as últimas 24 h</a> · <a href="#videos">Ver todos os vídeos</a> · <a href="#quentes">Ver os mais quentes por nicho</a></p>
 <ol id="bolha" class="bolha" tabindex="-1"></ol><p id="bolha-vazio" class="muted" hidden></p></section>
 <section aria-labelledby="videos"><h2 id="videos">Vídeos em acompanhamento</h2>
 <nav class="controls chips" aria-label="Filtrar por nicho">{chips}</nav>

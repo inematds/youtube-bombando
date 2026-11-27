@@ -4,7 +4,7 @@ import math
 import re
 import statistics
 from collections import defaultdict
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 
 STOPWORDS = set('''a o as os um uma uns umas de da do das dos e é em no na nos nas
 por para com sem que se ao aos à às como mais muito sua seu seus suas eu você voce
@@ -81,6 +81,29 @@ def bonus_relevancia(video):
     retomada = math.log1p(max(0, ritmo - media) / max(100, media))
     permanencia = min(1, ritmo / 100) * min(1, idade_dias / 30)
     return volume + retomada + permanencia
+
+
+def ultimas_24h(video, agora):
+    """Ritmo e nota de um vídeo com menos de 24 h; None se não for dessa janela.
+
+    Sem foto anterior não há ritmo recente: vale views/h desde a publicação. Sem data
+    mas achado hoje pela busca "enviados hoje", usa views/24 (piso: a idade é < 24 h)."""
+    if video.get('indisponivel'):
+        return None
+    views = video['views'] if video['views'] is not None else numero(video.get('views_busca'))
+    idade = video['idade_h']
+    if idade is not None:
+        if idade >= 24:
+            return None
+        ritmo = views / max(idade, 1) if views is not None else None
+    else:
+        achado = video.get('achado_24h')
+        if not achado or agora - datetime.fromisoformat(achado) >= timedelta(hours=24):
+            return None
+        ritmo = views / 24 if views is not None else None
+    if ritmo is None:
+        return None
+    return dict(ritmo_24h=ritmo, nota_24h=math.log1p(ritmo) + math.log1p(video['multiplicador'] or 0))
 
 
 def assuntos(videos):

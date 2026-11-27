@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.1 — 2026-11-27
+
+- Seção “Bombando nas últimas 24 h”: busca “enviados hoje” por views em cada nicho, prioridade no detalhe e ranking por views/h desde a publicação.
+
 ## 1.5.1 — 2026-11-23
 
 - Marque vídeos como feitos ou oculte-os dos destaques. As vagas passam aos próximos do ranking, e as marcações podem ser desfeitas no navegador.

@@ -58,6 +58,7 @@ Edit `config.json`. Each item in `nichos` contains `nome`, `busca` and `ativo` (
 | Field | Default | Purpose |
 |---|---:|---|
 | `por_nicho_busca` | 40 | Maximum results per weekly search |
+| `por_nicho_24h` | 15 | Maximum results of the “uploaded today” search, sorted by views |
 | `dias_acompanhar` | 7 | Window since first discovery |
 | `max_detalhes_por_rodada` | 250 | Cap on detail queries |
 | `max_canais_por_rodada` | 120 (this repo uses 200) | Cap on channel query attempts per run |
@@ -175,7 +176,7 @@ Fixtures live in `tests/fixtures/buscas.json` (map by search term, with `entries
 2. **⚙️ script/timer — check without network.** Command: `python3 -m unittest discover -s tests -v`. Tests metrics, persistence, failures and panel in temporary directories.
 3. **⚙️ script/timer — demo the run.** Command: `python3 bombando/rodada.py --fixtures tests/fixtures`. Discovers examples, writes snapshots, queries channel fixtures, computes metrics and generates HTML in `dados/teste/painel/`.
 4. **🧠 session with Nei — review the result.** Command: `xdg-open dados/teste/painel/index.html`. Compare niches, scores, history, topics and “Why did it blow up?”.
-5. **⚙️ script/timer — query the real videos.** Command: `python3 bombando/rodada.py`. Runs weekly discovery → daily tracking → channel baselines → metrics → panel, with lock and logs.
+5. **⚙️ script/timer — query the real videos.** Command: `python3 bombando/rodada.py`. Runs weekly and today (24 h) discovery → daily tracking → channel baselines → metrics → panel, with lock and logs.
 6. **⚙️ script — fill in channels of tracked videos.** Command: `python3 bombando/rodada.py --so-canais`. Respects cache, cap, window and filter, with no discovery or snapshots. To test offline, add `--fixtures tests/fixtures`.
 7. **🧠 session with Nei — turn on the routine when you want.** Command: `bash deploy/instalar.sh`. Installs the schedule and the server.
 8. **⚙️ script/timer — repeat daily.** Command run by the unit: `python3 bombando/rodada.py`. At 7:15 AM, updates the snapshots within the window and the daily copy.

@@ -26,7 +26,8 @@ RAIZ = Path(__file__).resolve().parents[1]
 def configurar(raiz):
     config = json.loads((raiz / 'config.json').read_text(encoding='utf-8'))
     config.setdefault('max_canais_por_rodada', 120)
-    for chave in ('por_nicho_busca', 'dias_acompanhar', 'max_detalhes_por_rodada', 'max_canais_por_rodada'):
+    config.setdefault('por_nicho_24h', 15)
+    for chave in ('por_nicho_busca', 'por_nicho_24h', 'dias_acompanhar', 'max_detalhes_por_rodada', 'max_canais_por_rodada'):
         valor = config[chave]
         if type(valor) is not int or valor < 1:
             raise ValueError(f'{chave} deve ser inteiro positivo')
@@ -74,6 +75,8 @@ def executar(args, raiz=RAIZ):
                 fonte = Fonte(config, args.fixtures)
                 if not so_canais:
                     certos, novos = descobrir(db, fonte, nichos, agora, registrar)
+                    _, novos_24h = descobrir(db, fonte, nichos, agora, registrar, tipo='buscas24h')
+                    novos += novos_24h
                     fotos = acompanhar(db, fonte, agora, registrar, args.nicho)
                 canais_ok, canais_tentados = atualizar(db, fonte, agora, registrar, args.nicho)
                 with db:

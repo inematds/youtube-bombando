@@ -58,6 +58,7 @@ Edite `config.json`. Cada item de `nichos` contém `nome`, `busca` e `ativo` (bo
 | Campo | Padrão | Função |
 |---|---:|---|
 | `por_nicho_busca` | 40 | Máximo de resultados por busca semanal |
+| `por_nicho_24h` | 15 | Máximo de resultados da busca “enviados hoje”, ordenada por views |
 | `dias_acompanhar` | 7 | Janela desde a primeira descoberta |
 | `max_detalhes_por_rodada` | 250 | Teto de consultas de detalhes |
 | `max_canais_por_rodada` | 120 (este repo usa 200) | Teto de tentativas de consulta de canais por rodada |
@@ -92,6 +93,8 @@ Zero e ausência são distintos: `—` indica dado desconhecido. Views da busca 
 | × canal | views ÷ mediana dos últimos vídeos do canal; ≥ 3× furou a bolha |
 | Views | total de views, sem olhar idade nem canal |
 | Mais novos | menor idade primeiro |
+
+**Bombando nas últimas 24 h** (seção no topo do painel): cada nicho tem uma segunda busca, “enviados hoje” em ordem de views (`sp=CAMSAggC`). Os vídeos achados por ela passam na frente da fila de detalhe, para ganharem data e views na mesma rodada. Entram na seção os vídeos com menos de 24 h de publicação; sem data, mas achados hoje pela busca, entram com views ÷ 24 (um piso). Ordem: `ln(1 + views/h desde a publicação) + ln(1 + multiplicador)`. Não há duas fotos ainda, então é sinal de largada, não de tendência. Até 3 por nicho; as marcações “Já fiz” e “Ocultar” valem aqui também.
 
 **Idade** = tempo desde que o vídeo foi publicado no YouTube (não desde que o sistema o achou); aparece em horas até 48 h e depois em dias + horas.
 
@@ -175,7 +178,7 @@ As fixtures ficam em `tests/fixtures/buscas.json` (mapa por termo de busca, com 
 2. **⚙️ script/timer — verificar sem rede.** Comando: `python3 -m unittest discover -s tests -v`. Testa métricas, persistência, falhas e painel em diretórios temporários.
 3. **⚙️ script/timer — demonstrar a rodada.** Comando: `python3 bombando/rodada.py --fixtures tests/fixtures`. Descobre exemplos, grava fotos, consulta fixtures dos canais, calcula métricas e gera HTML em `dados/teste/painel/`.
 4. **🧠 sessão com o Nei — revisar o resultado.** Comando: `xdg-open dados/teste/painel/index.html`. Comparar nichos, notas, histórico, assuntos e “Por que bombou?”.
-5. **⚙️ script/timer — consultar os vídeos reais.** Comando: `python3 bombando/rodada.py`. Executa descoberta semanal → acompanhamento diário → linha de base dos canais → métricas → painel, com lock e logs.
+5. **⚙️ script/timer — consultar os vídeos reais.** Comando: `python3 bombando/rodada.py`. Executa descoberta semanal e de hoje (24 h) → acompanhamento diário → linha de base dos canais → métricas → painel, com lock e logs.
 6. **⚙️ script — preencher canais de vídeos acompanhados.** Comando: `python3 bombando/rodada.py --so-canais`. Respeita cache, teto, janela e filtro sem descoberta ou fotos. Para testar offline, acrescentar `--fixtures tests/fixtures`.
 7. **🧠 sessão com o Nei — ativar a rotina quando desejar.** Comando: `bash deploy/instalar.sh`. Instala o agendamento e o servidor.
 8. **⚙️ script/timer — repetir diariamente.** Comando executado pela unit: `python3 bombando/rodada.py`. Às 07:15, atualiza as fotos dentro da janela e a cópia diária.
