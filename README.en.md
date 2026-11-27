@@ -72,6 +72,8 @@ Each subprocess has a 120-second timeout, a 20-second socket and limited retries
 
 ## Metrics and score
 
+The panel has tabs at the top: 24 h highlights, full 24 h list, full panel, hottest, done, hidden, and tips & settings.
+
 Dates are stored in UTC. `timestamp` takes precedence over `upload_date`; the latter represents midnight UTC, an approximation when the time isn't provided.
 
 - **Age (h):** hours from publication to panel generation, floored at zero for future dates.

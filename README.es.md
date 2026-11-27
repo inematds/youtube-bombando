@@ -72,6 +72,8 @@ Cada subproceso tiene timeout de 120 segundos, socket de 20 segundos y reintento
 
 ## Métricas y nota
 
+El panel tiene pestañas arriba: destacados de 24 h, lista completa de 24 h, panel completo, más calientes, hechos, ocultos y consejos y configuración.
+
 Las fechas se almacenan en UTC. `timestamp` tiene preferencia sobre `upload_date`; este último representa la medianoche UTC, una aproximación cuando no se proporciona la hora.
 
 - **Edad (h):** horas desde la publicación hasta la generación del panel, limitada a cero para fechas futuras.

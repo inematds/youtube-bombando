@@ -124,6 +124,11 @@ button,select{font:inherit;background:var(--surface);color:var(--text);border:1p
 .bolha .acoes-video{clear:both}.marcacoes{margin:16px 0}.marcacoes ul{padding-inline-start:22px}
 .marcacoes li{margin-block:10px}.marcacoes li .acoes-video{display:inline-flex;margin:0 0 0 8px}
 .aviso-marcacao{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.abas{position:sticky;top:0;z-index:5;display:flex;gap:8px;overflow-x:auto;padding:12px 0;margin:0 0 8px;background:var(--bg);border-bottom:1px solid var(--border);scrollbar-width:thin}
+.abas a{flex:none;font-family:Sora,system-ui,sans-serif;font-size:.875rem;font-weight:600;text-decoration:none;padding:10px 14px;min-height:44px;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text)}
+.abas a[aria-current=page]{background:var(--accent);color:#1a1206;border-color:var(--accent)}.abas small{color:inherit;opacity:.75;font-variant-numeric:tabular-nums}
+.dicas dl{display:grid;grid-template-columns:minmax(10rem,max-content) 1fr;gap:8px 24px}.dicas dt{color:var(--muted)}.dicas dd{margin:0;overflow-wrap:anywhere}.dicas code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.875em;background:var(--surface);padding:1px 6px;border-radius:6px;overflow-wrap:anywhere}.dicas li{margin:8px 0;max-width:80ch}.dicas table{border-collapse:collapse;font-size:14px;width:100%}.dicas td,.dicas th{padding:8px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+@media(max-width:650px){.dicas dl{grid-template-columns:1fr}.dicas dd{margin-bottom:8px}}
 .erro-marcacao{color:var(--accent)}.videos .acoes-video{clear:both}
 @media(pointer:coarse){.acoes-video button{min-height:44px}}
 '''
@@ -138,7 +143,11 @@ const compacto=new Intl.NumberFormat('pt-BR',{notation:'compact',maximumFraction
 const fmt=n=>n==null?'—':formato.format(n);
 const curto=n=>n==null?'—':compacto.format(n);
 const vezes=n=>n==null?'—':fmt(n)+'×';
-const score=v=>nicho?v.notas_painel[nicho]:v.nota_painel;
+const ABAS=['bombando24','completa24','completo','maisquentes','jafiz','ocultei','dicas'];
+let aba='bombando24';
+const modo24=()=>aba==='completa24';
+const score=v=>modo24()?v.nota_24h:nicho?v.notas_painel[nicho]:v.nota_painel;
+const viewsDe=v=>modo24()?(v.views??v.views_busca):v.views;
 const categorias=['Conteúdo','Quem fala','Quem posta','Conteúdo + quem fala','Misto','Sem dados'];
 const classe=c=>'categoria-'+categorias.indexOf(c);
 const idade=h=>h==null?'—':h<48?Math.round(h)+' h':Math.floor(h/24)+' d '+Math.floor(h%24)+' h';
@@ -190,6 +199,9 @@ function destaqueRecente(v){
  return `<article>${miniatura(v)}${linkVideo(v)}<br><small>${esc(v.canal||'Canal não informado')}</small>
  ${acoesVideo(v.id)}<dl class="numeros">${numeros.map(([rotulo,valor])=>`<div><dt>${rotulo}</dt><dd>${esc(valor)}</dd></div>`).join('')}</dl></article>`;
 }
+function destaqueMarcado(v){
+ return `<li>${miniatura(v)}${linkVideo(v)}<br><small>${esc(v.canal||'Canal não informado')} · ${curto(v.views??v.views_busca)} views · idade ${idade(v.idade_h)}</small>${acoesVideo(v.id)}</li>`;
+}
 function vagas(ids, limite){
  return ids.filter(id=>!marcas.has(id)).slice(0,limite).map(id=>porId.get(id));
 }
@@ -209,10 +221,12 @@ function renderDestaques(){
   const ids=data.destaques.recentes[painel.dataset.recentes];
   painel.innerHTML=vagas(ids,3).map(destaqueRecente).join('')||'<p class="muted">Todos os vídeos elegíveis estão marcados.</p>';
  }
- const lista=[...marcas.keys()].map(id=>`<li>${linkVideo(porId.get(id)||{id,titulo:id})}${acoesVideo(id)}</li>`);
- document.getElementById('total-marcacoes').textContent=marcas.size;
- document.getElementById('lista-marcacoes').innerHTML=lista.join('');
- document.getElementById('marcacoes-vazio').hidden=lista.length>0;
+ for(const estado of Object.keys(estadosMarca)){
+  const ids=[...marcas].filter(([,e])=>e===estado).map(([id])=>id);
+  document.getElementById('lista-'+estado).innerHTML=ids.map(id=>destaqueMarcado(porId.get(id)||{id,titulo:id})).join('');
+  document.getElementById('vazio-'+estado).hidden=ids.length>0;
+  document.getElementById('conta-'+estado).textContent=ids.length;
+ }
 }
 function atualizarMarca(id, estado){
  if(Object.hasOwn(estadosMarca,estado))marcas.set(id,estado);
@@ -227,7 +241,7 @@ function marcar(botao){
  const id=acoes.dataset.marcaId;
  const estado=botao.dataset.marca;
  const item=botao.closest('li, article');
- const grupo=botao.closest('#bolha, [data-quentes], [data-recentes], #marcacoes');
+ const grupo=botao.closest('#bolha, [data-quentes], [data-recentes], [data-lista-marca]');
  const pos=item&&grupo?[...item.parentElement.children].indexOf(item):0;
  try {
   if(estado==='restaurar')localStorage.removeItem(prefixoMarca+id);
@@ -239,8 +253,7 @@ function marcar(botao){
  document.getElementById('aviso-marcacao').textContent=estado==='restaurar'
   ?'Marcação removida. O vídeo pode voltar aos destaques.'
   :`${estadosMarca[estado]}. O vídeo saiu dos destaques.`;
- const novoFoco=grupo?.id==='marcacoes'?grupo.querySelector('summary')
-  :grupo?(grupo.children[pos]||grupo.lastElementChild)?.querySelector('button')||grupo
+ const novoFoco=grupo?(grupo.children[pos]||grupo.lastElementChild)?.querySelector('button')||grupo
   :document.querySelector(`#lista [data-marca-id="${CSS.escape(id)}"] button`);
  novoFoco?.focus();
 }
@@ -252,7 +265,8 @@ function atualizarOrdem(){
  const chave=ordem.value;
  const coluna=chave==='novos'?'idade_h':chave==='velocidade'?'velocidade_recente':chave;
  const direcaoColuna=chave==='novos'?-direcao:direcao;
- document.getElementById('explica').textContent=ORDENS[chave][1];
+ document.getElementById('explica').textContent=modo24()&&chave==='nota'?NOTA_24H:ORDENS[chave][1];
+ rotuloRitmo.nodeValue=modo24()?'Views/h desde a publicação ':'Views/h recentes ';
  inverter.textContent=direcao===1?'↑':'↓';
  inverter.setAttribute('aria-label',direcao===1?'Crescente. Inverter ordem':'Decrescente. Inverter ordem');
  for(const botao of colunas){
@@ -276,12 +290,17 @@ function porque(){
  document.getElementById('distribuicao').innerHTML=resumo.categorias.filter(c=>c.pct_views>0).map(c=>`<span class="${classe(c.categoria)}" style="width:${c.pct_views}%" title="${esc(c.categoria)}: ${fmt(c.pct_views)}% das views"></span>`).join('');
  document.getElementById('legenda').innerHTML=resumo.categorias.map(c=>`<li><span class="chip ${classe(c.categoria)}">${esc(c.categoria)}</span> ${fmt(c.pct_views)}% das views (${fmt(c.views)}) · ${fmt(c.pct_videos)}% dos vídeos (${c.videos})</li>`).join('');
 }
+const NOTA_24H='Só vídeos com menos de 24 h: ln(1 + views/h desde a publicação) + ln(1 + views ÷ inscritos). Sinal de largada; ainda não há duas medições.';
+const rotuloRitmo=document.querySelector('[data-ordem="velocidade_recente"]').firstChild;
 function render(){
  const key=ordem.value;
+ document.getElementById('titulo-tabela').textContent=modo24()?'Todos os vídeos das últimas 24 h':'Vídeos em acompanhamento';
+ prioridade.closest('label').hidden=modo24();
  const minimo=notaMinima.valueAsNumber;
- const val=v=>key==='nota'?score(v):key==='novos'?(v.idade_h==null?null:-v.idade_h):v[key];
+ const val=v=>key==='nota'?score(v):key==='novos'?(v.idade_h==null?null:-v.idade_h)
+   :key==='views'?viewsDe(v):modo24()&&key==='velocidade_recente'?v.ritmo_24h:v[key];
  const list=data.videos.filter(v=>(!nicho||v.nichos.includes(nicho))&&
-   (!prioridade.checked||(!v.indisponivel&&v.views>MIN_VIEWS))&&
+   (modo24()?v.nota_24h!=null:(!prioridade.checked||(!v.indisponivel&&v.views>MIN_VIEWS)))&&
    (!Number.isFinite(minimo)||(score(v)!=null&&score(v)>=minimo))).sort((a,b)=>{
    if(Boolean(a.indisponivel)!==Boolean(b.indisponivel))return a.indisponivel-b.indisponivel;
    const x=val(a),y=val(b);
@@ -289,7 +308,7 @@ function render(){
    return direcao*(key==='titulo'?collator.compare(x,y):x-y);
  });
  atualizarOrdem();
- document.getElementById('lista').innerHTML=list.map(v=>`<tr><td>${images?miniatura(v):''}${linkVideo(v)}<br><small>${esc(v.canal||'Canal não informado')}${v.indisponivel?' · Indisponível':''}</small>${acoesVideo(v.id)}</td><td data-label="Idade">${idade(v.idade_h)}</td><td data-label="Views">${fmt(v.views)}</td><td data-label="Views/h recentes">${fmt(v.velocidade_recente)}${key==='velocidade'?`<small class="motivo">${fmt(v.velocidade)} desde a publicação</small>`:''}</td><td data-label="Ganho 24h">${fmt(v.ganho_24h)}</td><td data-label="Multiplicador">${vezes(v.multiplicador)}</td><td data-label="× canal">${vezes(v.fator_canal)}</td><td data-label="Por quê"><span class="chip ${classe(v.categoria)}" title="${esc(v.motivo)}">${esc(v.categoria)}</span><small class="motivo">${esc(v.motivo)}${v.trecho_convidado?` · trecho: “${esc(v.trecho_convidado)}”`:v.trecho_pessoa?` · trecho: “${esc(v.trecho_pessoa)}”`:""}</small></td><td data-label="Nota">${fmt(score(v))}</td><td data-label="Crescimento"><button class="vergrafico" data-grafico="${esc(v.id)}" title="Abrir o gráfico de crescimento">${v.sparkline}<small>ver gráfico</small></button></td></tr>`).join('');
+ document.getElementById('lista').innerHTML=list.map(v=>`<tr><td>${images?miniatura(v):''}${linkVideo(v)}<br><small>${esc(v.canal||'Canal não informado')}${v.indisponivel?' · Indisponível':''}</small>${acoesVideo(v.id)}</td><td data-label="Idade">${idade(v.idade_h)}</td><td data-label="Views">${fmt(viewsDe(v))}</td><td data-label="${modo24()?'Views/h desde a publicação':'Views/h recentes'}">${fmt(modo24()?v.ritmo_24h:v.velocidade_recente)}${key==='velocidade'?`<small class="motivo">${fmt(v.velocidade)} desde a publicação</small>`:''}</td><td data-label="Ganho 24h">${fmt(v.ganho_24h)}</td><td data-label="Multiplicador">${vezes(v.multiplicador)}</td><td data-label="× canal">${vezes(v.fator_canal)}</td><td data-label="Por quê"><span class="chip ${classe(v.categoria)}" title="${esc(v.motivo)}">${esc(v.categoria)}</span><small class="motivo">${esc(v.motivo)}${v.trecho_convidado?` · trecho: “${esc(v.trecho_convidado)}”`:v.trecho_pessoa?` · trecho: “${esc(v.trecho_pessoa)}”`:""}</small></td><td data-label="Nota">${fmt(score(v))}</td><td data-label="Crescimento"><button class="vergrafico" data-grafico="${esc(v.id)}" title="Abrir o gráfico de crescimento">${v.sparkline}<small>ver gráfico</small></button></td></tr>`).join('');
  document.getElementById('vazio').hidden=list.length>0;
  const terms=nicho?data.assuntos.nichos[nicho]||[]:data.assuntos.geral;
  document.getElementById('termos').innerHTML=terms.length?terms.map(t=>`<div class="term">${esc(t.termo)} <small>${fmt(t.peso)} views/h</small><div class="bar"><span style="width:${100*t.peso/terms[0].peso}%"></span></div></div>`).join(''):'<p class="muted">Ainda não há velocidade suficiente para destacar assuntos.</p>';
@@ -307,13 +326,29 @@ document.querySelector('main').addEventListener('click',e=>{
  if(botao?.hasAttribute('data-marca'))marcar(botao);
  else if(botao)abrir(botao.dataset.grafico);
 });
-document.querySelector('a[href="#marcacoes"]').addEventListener('click',()=>{
- document.getElementById('marcacoes').open=true;
-});
+function mostrarAba(nome){
+ const antes=modo24();
+ aba=nome;
+ for(const s of document.querySelectorAll('[data-abas]'))s.hidden=!s.dataset.abas.split(' ').includes(nome);
+ for(const a of document.querySelectorAll('[data-aba]')){
+  if(a.dataset.aba===nome)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');
+ }
+ if(antes!==modo24()){ordem.value='nota';direcao=-1;}
+ render();
+}
+function deHash(){
+ const h=decodeURIComponent(location.hash.slice(1));
+ if(ABAS.includes(h)){mostrarAba(h);window.scrollTo(0,0);return;}
+ const alvo=h?document.getElementById(h):null;
+ const secao=alvo?.closest('[data-abas]');
+ mostrarAba(secao?secao.dataset.abas.split(' ').at(-1):'bombando24');
+ alvo?.scrollIntoView();
+}
+window.addEventListener('hashchange',deHash);
 document.getElementById('fechar').addEventListener('click',()=>document.getElementById('janela').close());
 document.getElementById('imagens').addEventListener('click',function(){images=!images;document.body.classList.toggle('sem-imagens',!images);this.setAttribute('aria-pressed',String(images));this.textContent=images?'Ocultar miniaturas':'Exibir miniaturas';render()});
 renderDestaques();
-render();
+deHash();
 '''
 
 
@@ -329,6 +364,49 @@ ORDENS = {
     'views': ('Views', 'Total de visualizações hoje, sem levar em conta idade nem tamanho do canal. Canais grandes tendem a dominar.'),
     'novos': ('Mais novos', 'Menor idade primeiro: os vídeos publicados há menos tempo.'),
 }
+
+
+LIMITES = (
+    ('por_nicho_busca', 'Resultados por busca semanal, por nicho'),
+    ('por_nicho_24h', 'Resultados da busca “enviados hoje”, por nicho'),
+    ('dias_acompanhar', 'Dias que cada vídeo descoberto é acompanhado'),
+    ('max_detalhes_por_rodada', 'Vídeos consultados por rodada (views do dia)'),
+    ('max_canais_por_rodada', 'Canais consultados por rodada (mediana do canal)'),
+    ('pausa_s', 'Pausa entre consultas ao YouTube, em segundos'),
+    ('regiao', 'Região pedida ao YouTube'),
+)
+
+DICAS = (
+    'Como ler: <strong>Bombando 24 h</strong> é largada (vídeos de hoje, sem histórico); '
+    '<strong>Mais quentes</strong> é tendência (vários dias de medição); '
+    '<strong>Furaram a bolha</strong> (em Bombando completo) mostra canais pequenos e médios acima do próprio normal: '
+    'o melhor sinal de que o assunto, e não o canal, puxou as views.',
+    'Um vídeo forte nas 24 h que amanhã ainda aparece em Mais quentes confirmou: é o melhor candidato a virar pauta.',
+    '“Já fiz” e “Ocultei” ficam guardados só neste navegador. Em outro navegador ou computador as listas começam vazias.',
+    'Na tabela, clique no nome da coluna para ordenar; clique de novo para inverter. “Nota mínima” corta o ruído; '
+    'desmarque “Mais de 50 mil views” para ver os pequenos.',
+    'O endereço de cada aba pode virar favorito (ex.: <code>#bombando24</code>, <code>#jafiz</code>).',
+    'Para mudar nichos ou limites, edite <code>config.json</code>: cada nicho tem <code>nome</code>, <code>busca</code> '
+    '(o texto pesquisado) e <code>ativo</code>. Use <code>"ativo": false</code> para pausar um nicho sem perder o histórico.',
+    'Busca mais específica traz vídeos mais certeiros: “claude code tutorial” acha menos ruído que “claude”.',
+    'Para atualizar agora, rode <code>python3 bombando/rodada.py</code>. Só um nicho: <code>--nicho \'claude code\'</code>. '
+    'Só refazer o painel: <code>--so-painel</code>.',
+)
+
+
+def dicas(config):
+    nichos = config.get('nichos') or []
+    linhas = ''.join(
+        f'<tr><td>{html.escape(n.get("nome", ""))}</td><td><code>{html.escape(n.get("busca", ""))}</code></td>'
+        f'<td>{"ativo" if n.get("ativo") else "pausado"}</td></tr>' for n in nichos)
+    limites = ''.join(f'<dt>{html.escape(rotulo)}</dt><dd><code>{html.escape(chave)}</code> = {html.escape(str(config[chave]))}</dd>'
+                      for chave, rotulo in LIMITES if chave in config)
+    return (f'<h3>Dicas</h3><ul>{"".join(f"<li>{d}</li>" for d in DICAS)}</ul>'
+            '<h3>Quando atualiza</h3><p>Todo dia às 07:15, pelo timer <code>youtube-bombando.timer</code>. '
+            'Cada vídeo ganha uma medição por dia; a rodada respeita o lock e o teto de consultas.</p>'
+            + (f'<h3>Limites atuais</h3><dl>{limites}</dl>' if limites else '')
+            + (f'<h3>Nichos ({len(nichos)})</h3><table><thead><tr><th>Nicho</th><th>Busca no YouTube</th><th>Estado</th></tr></thead><tbody>{linhas}</tbody></table>' if nichos else '')
+            + '<p class="muted">Esta aba só mostra a configuração. Para mudar, edite <code>config.json</code>; vale na próxima rodada.</p>')
 
 
 def cabecalho_ordenavel(chave, rotulo=None):
@@ -376,6 +454,8 @@ def gerar(dados, pasta, agora):
         f'<section class="hot-nicho"><h3>{html.escape(n)}</h3>'
         f'<div class="hot" data-recentes="{html.escape(n, quote=True)}" tabindex="-1"></div></section>'
         for n, ids in recentes.items() if ids)
+    total_24h = sum(1 for v in dados['videos'] if v['nota_24h'] is not None)
+    dicas_html = dicas(dados.get('config') or {})
     opcoes = ''.join(f'<option value="{chave}">{html.escape(rotulo)}</option>'
                      for chave, (rotulo, _) in ORDENS.items())
     colunas = ''.join(cabecalho_ordenavel(chave, rotulo) for chave, rotulo in (
@@ -387,21 +467,24 @@ def gerar(dados, pasta, agora):
     erro_html = '<details><summary>Ocorrências da rodada</summary><ul>' + ''.join(f'<li>{html.escape(e)}</li>' for e in erros) + '</ul></details>' if erros else ''
     pagina = f'''<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>YouTube bombando</title><style>{CSS}</style></head>
 <body><main><header><h1>YouTube bombando</h1><p class="muted">Descubra os assuntos que ganham força nos seus nichos.</p><p>Última rodada: {html.escape(data_local(rodada.get('instante')))} · {len(dados['videos'])} vídeos acompanhados · <span class="status">{status}</span>{' · Dados de exemplo (fixtures)' if rodada.get('fixtures') else ''}</p>{erro_html}</header>
-<section aria-labelledby="ultimas24"><h2 id="ultimas24">Bombando nas últimas 24 h</h2><p class="muted">Vídeos publicados há menos de 24 horas, achados pela busca “enviados hoje” de cada nicho, que vem ordenada por views. A ordem aqui segue as views por hora desde a publicação, com peso para views acima dos inscritos. Ainda não há histórico, então este é um sinal de largada, não de tendência.</p>{grupos_recentes or '<p class="muted">Nenhum vídeo das últimas 24 h com views medidas nesta rodada.</p>'}</section>
-<section aria-labelledby="furaram"><h2 id="furaram">10 vídeos que furaram a bolha</h2><p class="muted">Canais pequenos e médios com mais de 50 mil views e pelo menos 3× a mediana de views do próprio canal.</p>
-<details id="marcacoes" class="marcacoes"><summary>Minhas marcações (<span id="total-marcacoes">0</span>)</summary><p class="muted">As marcações valem para todos os nichos neste navegador.</p><p id="marcacoes-vazio" class="muted">Nenhum vídeo marcado.</p><ul id="lista-marcacoes"></ul></details>
+<nav class="abas" aria-label="Abas do painel"><a href="#bombando24" data-aba="bombando24">Bombando 24 h</a><a href="#completa24" data-aba="completa24">24 h completa <small>{total_24h}</small></a><a href="#completo" data-aba="completo">Bombando completo</a><a href="#maisquentes" data-aba="maisquentes">Mais quentes</a><a href="#jafiz" data-aba="jafiz">Já fiz <small id="conta-feito">0</small></a><a href="#ocultei" data-aba="ocultei">Ocultei <small id="conta-oculto">0</small></a><a href="#dicas" data-aba="dicas">Dicas e configurações</a></nav>
 <p id="aviso-marcacao" class="aviso-marcacao" role="status"></p><p id="erro-marcacao" class="erro-marcacao" role="alert" hidden>O navegador bloqueou o armazenamento. As marcações valem até fechar ou recarregar a página.</p>
-<p><a href="#ultimas24">Ver as últimas 24 h</a> · <a href="#videos">Ver todos os vídeos</a> · <a href="#quentes">Ver os mais quentes por nicho</a></p>
+<section aria-labelledby="ultimas24" data-abas="bombando24"><h2 id="ultimas24">Bombando nas últimas 24 h</h2><p class="muted">Vídeos publicados há menos de 24 horas, achados pela busca “enviados hoje” de cada nicho, que vem ordenada por views. A ordem aqui segue as views por hora desde a publicação, com peso para views acima dos inscritos. Ainda não há histórico, então este é um sinal de largada, não de tendência. A lista inteira está na aba <a href="#completa24">24 h completa</a>.</p>{grupos_recentes or '<p class="muted">Nenhum vídeo das últimas 24 h com views medidas nesta rodada.</p>'}</section>
+<section aria-labelledby="furaram" data-abas="completo"><h2 id="furaram">10 vídeos que furaram a bolha</h2><p class="muted">Canais pequenos e médios com mais de 50 mil views e pelo menos 3× a mediana de views do próprio canal.</p>
+<p><a href="#videos">Ver todos os vídeos</a> · <a href="#maisquentes">Ver os mais quentes por nicho</a></p>
 <ol id="bolha" class="bolha" tabindex="-1"></ol><p id="bolha-vazio" class="muted" hidden></p></section>
-<section aria-labelledby="videos"><h2 id="videos">Vídeos em acompanhamento</h2>
+<section aria-labelledby="videos" data-abas="completa24 completo"><h2 id="videos"><span id="titulo-tabela">Vídeos em acompanhamento</span></h2>
 <nav class="controls chips" aria-label="Filtrar por nicho">{chips}</nav>
 <div class="controls limites"><label><input type="checkbox" id="prioridade" checked> Mais de 50 mil views</label><label>Nota mínima <input type="number" id="nota-minima" step="any"></label><button id="imagens" aria-pressed="true">Ocultar miniaturas</button></div>
 <div class="controls"><label for="ordem">Ordenar por</label><select id="ordem">{opcoes}</select><button id="direcao" class="direcao" type="button" aria-label="Inverter ordem">↓</button></div>
 <p id="explica" class="explica" aria-live="polite"></p><details class="opcoes"><summary>O que cada opção de ordenação quer dizer</summary><dl>{''.join(f'<dt>{html.escape(t)}</dt><dd>{html.escape(d)}</dd>' for t, d in ORDENS.values())}</dl></details>
 <p id="contagem" class="muted" aria-live="polite"></p><table class="videos"><thead><tr>{colunas}<th scope="col">Por quê</th>{cabecalho_ordenavel('nota')}<th scope="col">Crescimento</th></tr></thead><tbody id="lista"></tbody></table><p id="vazio" class="empty" hidden>Nenhum vídeo atende aos filtros. Ajuste a nota mínima ou o corte de views.</p></section>
-<section aria-labelledby="assuntos"><h2 id="assuntos">Assuntos em alta</h2><div class="terms" id="termos"></div></section>
-<section aria-labelledby="porque"><h2 id="porque">Por que bombou?</h2><p class="muted">Sinais de conteúdo, canal e convidado. Percentuais consideram vídeos disponíveis com views confirmadas no nicho selecionado.</p><div id="distribuicao" class="distribuicao" aria-label="Distribuição das views por categoria"></div><ul id="legenda" class="legenda"></ul><p id="conclusao" aria-live="polite"></p></section>
-<section aria-labelledby="quentes"><h2 id="quentes">3 vídeos mais quentes de cada nicho</h2><p class="muted">Os melhores pela nota de cada nicho, com miniatura, métricas e histórico de views. Aqui entram vídeos de qualquer volume de views.</p><p><a href="#marcacoes">Gerenciar minhas marcações</a></p>{grupos_quentes or '<p class="muted">Aguardando a primeira coleta.</p>'}</section>
+<section aria-labelledby="assuntos" data-abas="completo"><h2 id="assuntos">Assuntos em alta</h2><div class="terms" id="termos"></div></section>
+<section aria-labelledby="porque" data-abas="completo"><h2 id="porque">Por que bombou?</h2><p class="muted">Sinais de conteúdo, canal e convidado. Percentuais consideram vídeos disponíveis com views confirmadas no nicho selecionado.</p><div id="distribuicao" class="distribuicao" aria-label="Distribuição das views por categoria"></div><ul id="legenda" class="legenda"></ul><p id="conclusao" aria-live="polite"></p></section>
+<section aria-labelledby="quentes" data-abas="maisquentes"><h2 id="quentes">3 vídeos mais quentes de cada nicho</h2><p class="muted">Os melhores pela nota de cada nicho, com miniatura, métricas e histórico de views. Aqui entram vídeos de qualquer volume de views.</p><p class="muted">Marcados como feitos ou ocultos saem daqui e ficam nas abas <a href="#jafiz">Já fiz</a> e <a href="#ocultei">Ocultei</a>.</p>{grupos_quentes or '<p class="muted">Aguardando a primeira coleta.</p>'}</section>
+<section aria-labelledby="t-feito" data-abas="jafiz"><h2 id="t-feito">Já fiz</h2><p class="muted">Vídeos que você marcou como feitos. Eles saem dos destaques; “Voltar aos destaques” desfaz.</p><p id="vazio-feito" class="muted">Nenhum vídeo marcado como feito.</p><ol id="lista-feito" class="bolha" data-lista-marca tabindex="-1"></ol></section>
+<section aria-labelledby="t-oculto" data-abas="ocultei"><h2 id="t-oculto">Ocultei</h2><p class="muted">Vídeos que você tirou dos destaques sem fazer. “Voltar aos destaques” desfaz.</p><p id="vazio-oculto" class="muted">Nenhum vídeo oculto.</p><ol id="lista-oculto" class="bolha" data-lista-marca tabindex="-1"></ol></section>
+<section aria-labelledby="t-dicas" data-abas="dicas" class="dicas"><h2 id="t-dicas">Dicas e configurações</h2>{dicas_html}</section>
 <footer>— indica dado ainda não disponível. Miniaturas vêm do YouTube (internet). Links abrem o YouTube.</footer><noscript>Ative JavaScript para ver os destaques e consultar a tabela.</noscript></main>
 <dialog id="janela" aria-label="Gráfico de crescimento"><div id="janela-corpo"></div><button id="fechar">Fechar</button></dialog>
 <script id="min-views" type="application/json">{MIN_VIEWS}</script><script id="ordens" type="application/json">{json.dumps(ORDENS, ensure_ascii=False).replace('<', '\\u003c')}</script><script id="dados" type="application/json">{seguro}</script><script>{JS}</script></body></html>'''

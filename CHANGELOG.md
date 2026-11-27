@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.7.1 — 2026-11-27
+
+- Abas no topo do painel: Bombando 24 h, 24 h completa, Bombando completo, Mais quentes, Já fiz, Ocultei e Dicas e configurações.
+- “Já fiz” e “Ocultei” viram listas próprias com miniatura e botão de desfazer; a aba de dicas mostra limites, nichos e buscas do `config.json`.
+
 ## 1.6.1 — 2026-11-27
 
 - Seção “Bombando nas últimas 24 h”: busca “enviados hoje” por views em cada nicho, prioridade no detalhe e ranking por views/h desde a publicação.

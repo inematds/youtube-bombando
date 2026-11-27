@@ -96,6 +96,8 @@ Zero e ausência são distintos: `—` indica dado desconhecido. Views da busca 
 
 **Bombando nas últimas 24 h** (seção no topo do painel): cada nicho tem uma segunda busca, “enviados hoje” em ordem de views (`sp=CAMSAggC`). Os vídeos achados por ela passam na frente da fila de detalhe, para ganharem data e views na mesma rodada. Entram na seção os vídeos com menos de 24 h de publicação; sem data, mas achados hoje pela busca, entram com views ÷ 24 (um piso). Ordem: `ln(1 + views/h desde a publicação) + ln(1 + multiplicador)`. Não há duas fotos ainda, então é sinal de largada, não de tendência. Até 3 por nicho; as marcações “Já fiz” e “Ocultar” valem aqui também.
 
+**Abas do painel** (fixas no topo; o endereço de cada uma pode virar favorito): `#bombando24` (destaques de 24 h, abre por padrão) · `#completa24` (tabela só com vídeos de menos de 24 h, ordenada pela nota de 24 h) · `#completo` (furaram a bolha, tabela inteira, assuntos e por que bombou) · `#maisquentes` · `#jafiz` · `#ocultei` (vídeos marcados, com “Voltar aos destaques”) · `#dicas` (como ler o painel, limites atuais, nichos e buscas, horário da rodada). As marcações ficam no navegador.
+
 **Idade** = tempo desde que o vídeo foi publicado no YouTube (não desde que o sistema o achou); aparece em horas até 48 h e depois em dias + horas.
 
 **Assuntos em alta:** top 30 vídeos por nota em cada nicho (e top 30 geral sem duplicar IDs). Com pelo menos 5 vídeos, um termo precisa aparecer em dois títulos; em grupos menores, basta um. Extrai palavras e bigramas adjacentes, remove stopwords PT/EN, palavras de uma letra e números isolados. Cada termo recebe uma contribuição por título, igual à velocidade do vídeo. Exibe os 15 maiores pesos. É uma heurística lexical, sem IA ou interpretação semântica.

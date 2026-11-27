@@ -88,6 +88,7 @@ def executar(args, raiz=RAIZ):
             if ultima:
                 resultado['rodada']['erros'] = json.loads(ultima['erros'])
             resultado['gerado_em'] = agora.isoformat()
+            resultado['config'] = config
             gerar(resultado, raiz / 'painel', agora)
             mensagem = f'rodada ok: {certos} nichos, {novos} novos, {fotos} fotos, {len(erros)} erros -> painel/index.html'
             logger.info(mensagem)

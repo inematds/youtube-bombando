@@ -54,7 +54,9 @@ class RodadaTest(unittest.TestCase):
         self.assertIn('Vídeo privado de demonstração', pagina)
         self.assertNotIn('<script src=', pagina)
         estatico = pagina.split('<script id="dados"')[0]
-        self.assertIn('id="marcacoes"', estatico)
+        self.assertIn('id="lista-feito"', estatico)
+        self.assertIn('href="#completa24"', estatico)
+        self.assertIn('Dicas e configurações', estatico)
         self.assertIn('data-quentes="chatgpt"', estatico)
         self.assertIn('O que cada opção de ordenação quer dizer', estatico)
         dados = self.dados()
